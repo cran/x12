@@ -4,7 +4,7 @@ x12 <- function(tso,period=frequency(tso),decimals=2,transform="auto",
 				regvariables=NULL,reguser=NULL,regfile=NULL,regfilestart=NULL,regfileformat=NULL,
                 tblnames=NULL,Rtblnames=NULL
                 ,addLines=NULL,
-                x12path,x13path,use="x12",
+                x12path=NULL,x13path=NULL,use="x12",
 				seats=FALSE, seatsparameter=NULL,
                 sigmalim=c(1.5,2.5),outlier=NULL,outlier_span=NULL,
 				file=paste(getwd(),"/Rout",sep=""),forecast_years=NULL,estimate=NULL,slidingspans=NULL,aictest=NULL,onlytd=FALSE
@@ -117,13 +117,15 @@ x12 <- function(tso,period=frequency(tso),decimals=2,transform="auto",
   close(con)
   con1 <- file("run.bat")
   mdcommand <- "md gra"
-  x12path_1 <- gsub("/","\\\\",x12path) 
-  x13path_1 <- gsub("/","\\\\",x13path)
   file_1 <- gsub("/","\\\\",file)
-  if(use=="x12")
+  if((!is.null(x12path)) && use=="x12"){
+    x12path_1 <- gsub("/","\\\\",x12path)
     command <- paste(x12path_1," ",file_1," -g gra",sep="")
-  else
+  }else if((!is.null(x13path)) && use!="x12"){
+    x13path_1 <- gsub("/","\\\\",x13path)
     command <- paste(x13path_1," ",file_1," -g gra",sep="")
+  }else
+    stop("Please define the path to the X12 binaries!")
   writeLines(c(mdcommand,command),con1)
   close(con1)
   system("run.bat")

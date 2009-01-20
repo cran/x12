@@ -7,8 +7,8 @@ afterwards the output is read into R.
 }
 \usage{x12(tso, period=frequency(tso), decimals=2, transform="auto", arima=NULL, sarima=NULL, automdl=FALSE,
          maxorder=c(3,3), maxdiff=c(1,1), regvariables=NULL, reguser=NULL, regfile=NULL, regfilestart=NULL,
-         regfileformat=NULL, tblnames=NULL, Rtblnames=NULL, addLines=NULL, x12path,
-         x13path, use="x12", seats=FALSE, seatsparameter=NULL, sigmalim=c(1.5,2.5),
+         regfileformat=NULL, tblnames=NULL, Rtblnames=NULL, addLines=NULL, x12path=NULL,
+         x13path=NULL, use="x12", seats=FALSE, seatsparameter=NULL, sigmalim=c(1.5,2.5),
          outlier=NULL, outlier_span=NULL, file=paste(getwd(),"/Rout",sep=""), forecast_years=NULL,
          estimate=NULL,slidingspans=NULL,aictest=NULL,onlytd=FALSE)
 }
