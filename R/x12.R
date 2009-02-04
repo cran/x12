@@ -227,7 +227,7 @@ plot.x12<-function(x,plots=c(1:9),...){
     plot_original(x)    
   }
   if(any(plots==2)){
-    plot_origrinal_seasonal_trend(x)
+    plot_original_seasonal_trend(x)
   }
   if(any(plots==3)){
     plot_original(x,log_transform=TRUE)
@@ -249,7 +249,8 @@ plot.x12<-function(x,plots=c(1:9),...){
   }
   if(any(plots==9)){
     plot_spectrum(x,which="residuals")
-  }  
+  }
+  par(ask=FALSE)
 }
 
 
@@ -264,7 +265,7 @@ print.x12 <- function(x,editor="notepad",...){
   system("run.bat")
 }
 
-plot_seasonal_factors <- function(out,SI_Ratios=TRUE,ylab="Value",xlab="",col_seasonal="black",col_mean="blue",col_siratio="darkgreen",col_replaced="red",cex=.9,...){
+plot_seasonal_factors <- function(out,SI_Ratios=TRUE,ylab="Value",xlab="",lwd_seasonal=1,col_seasonal="black",lwd_mean=1,col_mean="blue",col_siratio="darkgreen",col_replaced="red",cex_siratio=.9,cex_replaced=.9,SI_Ratios_replaced=TRUE,plot_legend=TRUE,...){
   if(!SI_Ratios)
     v <- as.vector(out[["d10"]]) # Seasonal Factors
   else
@@ -290,7 +291,7 @@ plot_seasonal_factors <- function(out,SI_Ratios=TRUE,ylab="Value",xlab="",col_se
   }
   ylim <- c(min(v,na.rm=TRUE)*.95,max(v,na.rm=TRUE)*1.09)
   xlim <- c(0,f)
-  plot(1,type="n",,main=main,xlim=xlim,ylim=ylim,xaxt="n",ylab=ylab,xlab=xlab,cex=cex,...)
+  plot(1,type="n",main=main,xlim=xlim,ylim=ylim,xaxt="n",ylab=ylab,xlab=xlab,cex=cex_siratio,...)
   axis(1,at=(1:f)-1/2,labels=lab)
   for(i in 0:(f)){    
     abline(v=i,col="grey")
@@ -310,17 +311,23 @@ plot_seasonal_factors <- function(out,SI_Ratios=TRUE,ylab="Value",xlab="",col_se
   for(i in 0:(f-1)){
     s <- seq(.1+i,(i+1)-.1,l=nrow(out_matrix))
     m <- mean(out_matrix[,i+1],na.rm=TRUE)
-    points(rep(m,2)~c(s[1],s[length(s)]),type="l",col=col_mean)
-    points(out_matrix[,i+1]~s,type="l",col=col_seasonal)
+    points(rep(m,2)~c(s[1],s[length(s)]),type="l",col=col_mean,lwd=lwd_mean)
+    points(out_matrix[,i+1]~s,type="l",col=col_seasonal,lwd=lwd_seasonal)
     if(SI_Ratios){
-      points(out_matrix2[,i+1]~s,pch=20,cex=cex,col=col_siratio)
-      points(out_matrix3[,i+1]~s,pch=20,cex=cex,col=col_replaced)
+      points(out_matrix2[,i+1]~s,pch=20,cex=cex_siratio,col=col_siratio)
+      if(SI_Ratios_replaced)
+        points(out_matrix3[,i+1]~s,pch=20,cex=cex_replaced,col=col_replaced)
     }
   }
-  if(SI_Ratios)
-    legend(x=(f/2)-1,y=ylim[2],legend=c("Seasonal Factors","Mean","SI Ratio","Replaced SI Ratio"),col=c("black","blue","darkgreen","red"),pch=c(NA,NA,20,20),lty=c(1,1,NA,NA),bg="white")
-  else
-    legend(x=(f/2)-1,y=ylim[2],legend=c("Seasonal Factors","Mean"),col=c("black","blue"),lty=c(1,1),bg="white")    
+  if(plot_legend){
+    if(SI_Ratios){
+      if(SI_Ratios_replaced)
+        legend(x=(f/2)-1,y=ylim[2],legend=c("Seasonal Factors","Mean","SI Ratio","Replaced SI Ratio"),col=c(col_seasonal,col_mean,col_siratio,col_replaced),pch=c(NA,NA,20,20),lty=c(1,1,NA,NA),bg="white")
+      else
+        legend(x=(f/2)-1,y=ylim[2],legend=c("Seasonal Factors","Mean","SI Ratio"),col=c(col_seasonal,col_mean,col_siratio),pch=c(NA,NA,20),lty=c(1,1,NA),bg="white")      
+    }else
+      legend(x=(f/2)-1,y=ylim[2],legend=c("Seasonal Factors","Mean"),col=c(col_seasonal,col_mean),lty=c(1,1),bg="white")
+  }
 }
 
 plot_original <- function(out,ylab="Value",xlab="Date",main=if(!log_transform){"Original Series"}else{"Logs of the Original Series"},col="black",ytop=1,log_transform=FALSE,...){
@@ -331,31 +338,51 @@ plot_original <- function(out,ylab="Value",xlab="Date",main=if(!log_transform){"
   plot(ts,ylim=c(min(ts,na.rm=TRUE),max(ts,na.rm=TRUE)*ytop),xlab=xlab,ylab=ylab,main=main,col=col,...)
 }
 
-plot_origrinal_seasonal_trend <- function(out,ylab="Value",xlab="Date",
-  main="Original Series, Seasonally Asjusted Series and Trend",
-  col_original="black",col_seasonaladj="blue",col_trend="green",seasonaladj=TRUE,trend=TRUE,...){
-  plot_original(out,ytop=1.1,col=col_original,main=main,xlab=xlab,ylab=ylab,...)
-  text_leg <- "Original"
-  col_leg <- c(col_original)
+plot_original_seasonal_trend <- function(out,ylab="Value",xlab="Date",
+  main="Original Series, Seasonally Adjusted Series and Trend",
+  col_original="black",col_seasonaladj="blue",col_trend="green",
+  lwd_original=1,lwd_seasonaladj=1,lwd_trend=1,
+  seasonaladj=TRUE,trend=TRUE,original=TRUE,plot_legend=TRUE,log_transform=FALSE,...){
+  if(original)
+    plot_original(out,ytop=1.1,col=col_original,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,log_transform=log_transform,...)
+  else
+    plot_original(out,ytop=1.1,col=col_original,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,log_transform=log_transform,type="n",...)
+  text_leg <- vector()
+  col_leg <- vector()
+  if(original){
+    text_leg <- "Original"
+    col_leg <- c(col_original)
+  }
   if(seasonaladj){
     ts_adj <- out[["d11"]]
-    points(ts_adj,col=col_seasonaladj,type="l")
+    if(log_transform)
+      ts_adj <- log(ts_adj)
+    points(ts_adj,col=col_seasonaladj,type="l",lwd=lwd_seasonaladj)
     text_leg <- c(text_leg,"Seasonally Adjusted")
     col_leg <- c(col_leg,col_seasonaladj)
   }
   if(trend){
     ts_trend <- out[["d12"]]
-    points(ts_trend,col=col_trend,type="l")
+    if(log_transform)
+      ts_trend <- log(ts_trend)
+    points(ts_trend,col=col_trend,type="l",lwd=lwd_trend)
     text_leg <- c(text_leg,"Trend")
     col_leg <- c(col_leg,col_trend)
   }
   lty <- rep(1,length(col_leg))
-  legend(x=start(out[["a1"]])[1],y=max(out[["a1"]]*1.05,na.rm=TRUE)*1.05,lty=lty,legend=text_leg,col=col_leg)
+  if(plot_legend){
+    if(!log_transform)
+      legend(x=start(out[["a1"]])[1],y=max(out[["a1"]]*1.05,na.rm=TRUE)*1.05,lty=lty,legend=text_leg,col=col_leg)
+    else
+      legend(x=start(out[["a1"]])[1],y=log(max(out[["a1"]]*1.05,na.rm=TRUE))*1.05,lty=lty,legend=text_leg,col=col_leg)
+    
+  }
 }
 
 plot_spectrum <- function(out,which="seasonaladj",xlab="Frequency",ylab="Decibels",
   main="default",
-  col_bar="darkgrey",col_seasonal="red",col_td="blue")
+  col_bar="darkgrey",col_seasonal="red",col_td="blue",
+  lwd_bar=4,lwd_seasonal=1,lwd_td=1,plot_legend=TRUE)
 {
   if(main=="default"){
     if(which=="seasonaladj"){main <- "Spectrum of the Seasonally Adjusted Series"}
@@ -376,16 +403,18 @@ plot_spectrum <- function(out,which="seasonaladj",xlab="Frequency",ylab="Decibel
   coord <- par("usr")[3]
   
   for(i in 1:length(out[[which]]$frequency)){
-    points(x=rep(out[[which]]$frequency[i],2),y=c(out[[which]]$spectrum[i],coord),type="l",col=col_bar,lwd=4)  
+    points(x=rep(out[[which]]$frequency[i],2),y=c(out[[which]]$spectrum[i],coord),type="l",col=col_bar,lwd=lwd_bar)  
   }
   f <- frequency(out[["a1"]])
-  abline(v=(1:(f/2))*1/f,col=col_seasonal)
+  abline(v=(1:(f/2))*1/f,col=col_seasonal,lwd=lwd_seasonal)
   if(f==12)
-    abline(v=out[[which]]$frequency[c(43,53)],col=col_td)
+    abline(v=out[[which]]$frequency[c(43,53)],col=col_td,lwd=lwd_td)
   coord<-par("usr")
-  if(f==12)
-    legend(coord[1]/1.04,coord[4]*1.02,legend=c("Spectrum","Seasonalpeaks","Trading Day Peaks"),lty=rep(1,3),col=c(col_bar,col_seasonal,col_td),bg="white")
-  else
-    legend(coord[1]/1.04,coord[4]*1.02,legend=c("Spectrum","Seasonalpeaks"),lty=rep(1,2),col=c(col_bar,col_seasonal),bg="white")    
+  if(plot_legend){
+    if(f==12)
+      legend(coord[1]/1.04,coord[4]*1.02,legend=c("Spectrum","Seasonalpeaks","Trading Day Peaks"),lty=rep(1,3),col=c(col_bar,col_seasonal,col_td),bg="white")
+    else
+      legend(coord[1]/1.04,coord[4]*1.02,legend=c("Spectrum","Seasonalpeaks"),lty=rep(1,2),col=c(col_bar,col_seasonal),bg="white")
+  }
 }
 

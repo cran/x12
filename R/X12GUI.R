@@ -1,6 +1,6 @@
 ##low-level functions
 OpenNoteBook <- defmacro(window=tt,notebook=nb,height=400,width=400,expr={
-      notebook <- tkwidget(tt, 'NoteBook', height=height,width=width)
+      notebook <- tkwidget(window, 'NoteBook', height=height,width=width)
       tkgrid(notebook)
 })
 InsertTab <- defmacro(notebook=nb,frame=nbFrame1,tab="tab1",text="Page 1",expr={
@@ -243,20 +243,21 @@ x12PropertiesGUI <- function(){
     else
       x12pars$outlierspan <- "NULL"
     x12pars$ModelSelect <- tclvalue(ModelSelectValueVariable)
-    x12pars$maxOrder <- paste("c(",1+as.numeric(tclvalue(tcl(maxOrderBox1,"getvalue"))),",",1+as.numeric(tclvalue(tcl(maxOrderBox2,"getvalue"))),")",sep="")
+    x12pars$maxOrder <- paste("c(",as.numeric(tclvalue(tcl(maxOrderBox1,"getvalue"))),",",as.numeric(tclvalue(tcl(maxOrderBox2,"getvalue"))),")",sep="")
     x12pars$maxDiff <- paste("c(",1+as.numeric(tclvalue(tcl(maxDiffBox1,"getvalue"))),",",1+as.numeric(tclvalue(tcl(maxDiffBox2,"getvalue"))),")",sep="")
+    
     if(x12pars$ModelSelect!="auto"){
-      x12pars$arima <- paste("c(",1+as.numeric(tclvalue(tcl(arima1Box,"getvalue"))),","
-        ,1+as.numeric(tclvalue(tcl(arima2Box,"getvalue"))),","
-        ,1+as.numeric(tclvalue(tcl(arima3Box,"getvalue"))),")",sep="")
-      x12pars$sarima <- paste("c(",1+as.numeric(tclvalue(tcl(sarima1Box,"getvalue"))),","
-        ,1+as.numeric(tclvalue(tcl(sarima2Box,"getvalue"))),","
-        ,1+as.numeric(tclvalue(tcl(sarima3Box,"getvalue"))),")",sep="")
+      x12pars$arima <- paste("c(",as.numeric(tclvalue(tcl(arima1Box,"getvalue"))),","
+        ,as.numeric(tclvalue(tcl(arima2Box,"getvalue"))),","
+        ,as.numeric(tclvalue(tcl(arima3Box,"getvalue"))),")",sep="")
+      x12pars$sarima <- paste("c(",as.numeric(tclvalue(tcl(sarima1Box,"getvalue"))),","
+        ,as.numeric(tclvalue(tcl(sarima2Box,"getvalue"))),","
+        ,as.numeric(tclvalue(tcl(sarima3Box,"getvalue"))),")",sep="")
     }else{
       x12pars$arima <- "NULL"
       x12pars$sarima <- "NULL"
     }
-    x12pars$FctYears <- 1+as.numeric(tclvalue(tcl(FctYearsBox,"getvalue")))
+    x12pars$FctYears <- as.numeric(tclvalue(tcl(FctYearsBox,"getvalue")))
     x12pars$regFile <- as.character(tkget(regText,"0.0","end"))
     if(length(x12pars$regFile)==0)
       x12pars$regFile <- "NULL"
@@ -264,7 +265,7 @@ x12PropertiesGUI <- function(){
     x12pars$regStartDate <- as.numeric(tkget(regStartDate,"0.0","end"))
     if(length(x12pars$regStartDate)==0)
       x12pars$regStartDate <- "NULL"
-    x12pars$numbReg <- 1+as.numeric(tclvalue(tcl(NumberRegBox,"getvalue")))
+    x12pars$numbReg <- as.numeric(tclvalue(tcl(NumberRegBox,"getvalue")))
     x12pars$adj <- tclvalue(AdjValueVariable)
     x12pars$sigma <- c(as.numeric(tkget(sigmaLim1,"0.0","end")),as.numeric(tkget(sigmaLim2,"0.0","end")))
     if(length(x12pars$sigma!=2))
@@ -471,15 +472,15 @@ x12PropertiesGUI <- function(){
       values=maxOrder, width=3, textvariable=inimaxOrder1)
   maxOrderBox2 <- tkwidget(arimaFrame, "ComboBox", editable=FALSE,
       values=maxOrder, width=3, textvariable=inimaxOrder2)
-  maxDiff <- as.character(c(0:2))
+  maxDiff <- as.character(c(1:2))
   if(exists("x12pars"))
     inimaxDiff1 <- tclVar(as.character(as.numeric(strsplit(x12pars$maxDiff,"")[[1]][3])-1))
   else
-    inimaxDiff1 <- tclVar("0")
+    inimaxDiff1 <- tclVar("1")
   if(exists("x12pars"))
     inimaxDiff2 <- tclVar(as.character(as.numeric(strsplit(x12pars$maxDiff,"")[[1]][5])-1))
   else
-    inimaxDiff2 <- tclVar("0")
+    inimaxDiff2 <- tclVar("1")
   maxDiffBox1 <- tkwidget(arimaFrame, "ComboBox", editable=FALSE,
       values=maxDiff, width=3, textvariable=inimaxDiff1)
   maxDiffBox2 <- tkwidget(arimaFrame, "ComboBox", editable=FALSE,
