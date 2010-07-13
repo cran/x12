@@ -525,11 +525,11 @@ x12PropertiesGUI <- function(){
   tkgrid(tklabel(nbarima, text="Forecasts", fg="blue"))
   fctFrame <- tkframe(nbarima)
   tkgrid(fctFrame)
-  FctYears <- as.character(c(0:5))
+  FctYears <- as.character(c(1:6))
   if(exists("x12pars"))
-    iniFctYears <- tclVar(as.character(x12pars$FctYears-1))
+    iniFctYears <- tclVar(as.character(x12pars$FctYears))
   else
-    iniFctYears <- tclVar("0")
+    iniFctYears <- tclVar("1")
   FctYearsBox <- tkwidget(fctFrame, "ComboBox", editable=FALSE,
       values=FctYears, width=3, textvariable=iniFctYears)
   tkgrid(tklabel(fctFrame,text="Number of years to forecast:"),FctYearsBox)
