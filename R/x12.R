@@ -89,8 +89,12 @@ x12 <- function(tso,period=frequency(tso),decimals=2,transform="auto",
   addcommands[length(addcommands)+1] <- "}" }
   if(!is.null(forecast_years)){
     addcommands[length(addcommands)+1] <- "forecast {"
-	addcommands[length(addcommands)+1] <- paste("maxlead=",forecast_years*12,sep="")
-	addcommands[length(addcommands)+1] <- "}"
+	  addcommands[length(addcommands)+1] <- paste("maxlead=",forecast_years*12,sep="")
+	  addcommands[length(addcommands)+1] <- "}"
+  }else{
+    addcommands[length(addcommands)+1] <- "forecast {"
+    addcommands[length(addcommands)+1] <- paste("maxlead=",1*12,sep="")
+    addcommands[length(addcommands)+1] <- "}"
   }
   if(!seats){
     addcommands[length(addcommands)+1] <- "x11{"
@@ -197,9 +201,15 @@ readx12Out <- function(file,tblnames=NULL,Rtblnames=NULL,freq_series,start_serie
   out[["d9"]][out[["d9"]]==-999]<-NA
   out[["Forecast with CI"]] <- list()
   fct <- read.table(paste(filename,".","fct",sep=""),header=FALSE,skip=2,sep="	")
-  out[["Forecast with CI"]]$estimate <-ts(fct[,2],frequency=freq_series,start=end_series) 
-  out[["Forecast with CI"]]$lower <-ts(fct[,3],frequency=freq_series,start=end_series)
-  out[["Forecast with CI"]]$upper <-ts(fct[,4],frequency=freq_series,start=end_series)
+  if(end_series[2]==12){
+    start_forecast <- c(end_series[1]+1,1)
+  }else{
+    start_forecast <- end_series
+    start_forecast[2] <- start_forecast[2]+1 
+  }
+  out[["Forecast with CI"]]$estimate <-ts(fct[,2],frequency=freq_series,start=start_forecast) 
+  out[["Forecast with CI"]]$lower <-ts(fct[,3],frequency=freq_series,start=start_forecast)
+  out[["Forecast with CI"]]$upper <-ts(fct[,4],frequency=freq_series,start=start_forecast)
   out$seats <- seats
   out$file <- file
   out$tblnames <- tblnames

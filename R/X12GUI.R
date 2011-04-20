@@ -299,7 +299,7 @@ x12PropertiesGUI <- function(){
         ", x12path=\"",x12path,"\",seats=",x12pars$Seats,",seatsparameter=",x12pars$Seatsparameter,
         ", sigmalim=",x12pars$sigma,
         ",outlier=",x12pars$outlier,",outlier_span=",x12pars$outlierspan,
-        ",forecast_years=",x12pars$FctYears,",slidingspans=",x12pars$slidingspans,
+        ",forecast_years=",x12pars$FctYears+1,",slidingspans=",x12pars$slidingspans,
         ",aictest=",x12pars$aictest,
         ",onlytd=",x12pars$onlytd,
         ")",sep="")
