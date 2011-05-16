@@ -278,7 +278,10 @@ x12PropertiesGUI <- function(){
       x12path <- get("x12path", envir = as.environment(x12GUIenv))
     if(!exists("x12path")){
       x12path <- ""
-      x12path <- tclvalue(tkgetOpenFile(title="Please choose the x12 binaries",filetypes = "{{x12 executable} {.exe}} {{All files} *}"))
+      if(Sys.info()[1]=="Windows")
+        x12path <- tclvalue(tkgetOpenFile(title="Please choose the x12 binaries",filetypes = "{{x12 executable} {.exe}} {{All files} *}"))
+      else
+        x12path <- tclvalue(tkgetOpenFile(title="Please choose the x12 binaries",filetypes = "{{All files} *}"))
       #x12path <- paste(tclvalue(tkchooseDirectory(title = "Please choose the directory of the x12 binaries")),"/",sep="")
       assign("x12path",x12path, envir = as.environment(x12GUIenv))
     }

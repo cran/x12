@@ -24,7 +24,7 @@
   8: Spectrum Irregular
   9: Spectrum Residulas
 }
-\author{Alexander Kowarik, Statistics Austria,  March 2009}
+\author{Alexander Kowarik}
 \seealso{\code{\link{x12}}}
 \examples{
   data(AirPassengersX12)

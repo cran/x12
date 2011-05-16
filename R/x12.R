@@ -11,7 +11,7 @@ x12 <- function(tso,period=frequency(tso),decimals=2,transform="auto",
 ){
   header <- vector()
   header[1] <- "series{"
-  header[2] <- 'title="R Output for X12a.exe"'
+  header[2] <- 'title="R Output for X12a"'
   header[3] <- paste("decimals=",decimals,sep="")
   header[4] <- paste("start=",paste(start(tso),collapse="."),sep="")
   header[5] <- paste("period=",period,sep="")
@@ -119,20 +119,36 @@ x12 <- function(tso,period=frequency(tso),decimals=2,transform="auto",
     addcommands <- c(addcommands,addLines)
   writeLines(c(header,datarows,addcommands),con)
   close(con)
-  con1 <- file("run.bat")
-  mdcommand <- "md gra"
-  file_1 <- gsub("/","\\\\",file)
-  if((!is.null(x12path)) && use=="x12"){
-    x12path_1 <- gsub("/","\\\\",x12path)
-    command <- paste(x12path_1," ",file_1," -g gra",sep="")
-  }else if((!is.null(x13path)) && use!="x12"){
-    x13path_1 <- gsub("/","\\\\",x13path)
-    command <- paste(x13path_1," ",file_1," -g gra",sep="")
-  }else
-    stop("Please define the path to the X12 binaries!")
+  if(Sys.info()[1]=="Windows"){
+    con1 <- file("run.bat")
+    mdcommand <- "md gra"
+    file_1 <- gsub("/","\\\\",file)
+    if((!is.null(x12path)) && use=="x12"){
+      x12path_1 <- gsub("/","\\\\",x12path)
+      command <- paste(x12path_1," ",file_1," -g gra",sep="")
+    }else if((!is.null(x13path)) && use!="x12"){
+      x13path_1 <- gsub("/","\\\\",x13path)
+      command <- paste(x13path_1," ",file_1," -g gra",sep="")
+    }else
+      stop("Please define the path to the X12 binaries!")
+  }else{
+    con1 <- file("run.sh")
+    mdcommand <- "mkdir gra"
+    if((!is.null(x12path)) && use=="x12"){
+      command <- paste(x12path," ",file," -g gra",sep="")
+    }else if((!is.null(x13path)) && use!="x12"){
+      command <- paste(x13path," ",file," -g gra",sep="")
+    }else
+      stop("Please define the path to the X12 binaries!")
+  }
   writeLines(c(mdcommand,command),con1)
   close(con1)
-  system("run.bat")
+  if(Sys.info()[1]=="Windows")
+    system("run.bat")
+  else{
+    system("chmod 744 run.sh")
+    system("./run.sh")
+  }
 #  out <- list()
   out <- readx12Out(file,freq_series=frequency(tso),start_series=start(tso),end_series=end(tso),tblnames=tblnames,Rtblnames=Rtblnames)
 #  Rtblnames <- c("Original series", "Final seasonal factors", "Final seasonally adjusted data", "Final trend cycle",
@@ -264,15 +280,12 @@ plot.x12<-function(x,plots=c(1:9),...){
 }
 
 
-print.x12 <- function(x,editor="notepad",...){
-  con1 <- file("run.bat")
+print.x12 <- function(x,editor=getOption("editor"),...){
   if(!(x$file=="Example_for_X12"))
-    command <- paste(editor," ",x$file,".out",sep="")
+    filename <- paste(x$file,".out",sep="")
   else
-    command <- paste(editor," ", paste(searchpaths()[grep("x12",searchpaths())],"/doc/Rout",sep=""),".out",sep="")
-  writeLines(command,con1)
-  close(con1)
-  system("run.bat")
+    filename <- paste(paste(searchpaths()[grep("x12",searchpaths())],"/doc/Rout",sep=""),".out",sep="")
+  edit(file=filename,editor=editor,...)
 }
 
 plot_seasonal_factors <- function(out,SI_Ratios=TRUE,ylab="Value",xlab="",lwd_seasonal=1,col_seasonal="black",lwd_mean=1,col_mean="blue",col_siratio="darkgreen",col_replaced="red",cex_siratio=.9,cex_replaced=.9,SI_Ratios_replaced=TRUE,plot_legend=TRUE,...){

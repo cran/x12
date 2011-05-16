@@ -25,4 +25,4 @@ GUI for customizing plots
 \note{
   Uses objects of class x12.
 }
-\author{Alexander Kowarik, Statistics Austria,  January 2009}
+\author{Alexander Kowarik}

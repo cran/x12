@@ -60,6 +60,6 @@ afterwards the output is read into R.
   \url{http://www.census.gov/srd/www/x12a/}
 }
 \note{
- Only working on Windows and with installed x12 binaries.
+ Only working on with available x12 binaries.
 }
-\author{Alexander Kowarik, Statistics Austria,  January 2009}
+\author{Alexander Kowarik}

@@ -22,6 +22,6 @@ GUI for the wrapper function for x12.
 ### Examples
 }
 \note{
- Only working on Windows and with installed x12 binaries.
+ Only working on with available x12 binaries.
 }
-\author{Alexander Kowarik, Statistics Austria,  January 2009}
+\author{Alexander Kowarik}
