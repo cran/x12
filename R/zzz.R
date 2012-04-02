@@ -1,22 +1,9 @@
 .onLoad <- function(lib, pkg) {
-  # create new environment
-  x12GUIenv <<- new.env()
-  ## load data
-  # start GUI
-  cat("\n X12 GUI is ready to use. Type \"X12GUI()\" to start! \n")
-  cat("\n Type \"PlotX12GUI()\" to start the GUI for customizing the plots! \n")
-}
-.onUnload <- function(lib, pkg) {
-  rm(x12GUIenv)  
+  packageStartupMessage("x12 is ready to use.")
+  packageStartupMessage("Load the package x12GUI for a Graphical User Interface. (Coming soon) \n")
+  packageStartupMessage("It is advised to create the variables \"x12path\" and \"x13path\"")
+  packageStartupMessage("with valid paths to the X12 or X13 executables.\n")
 }
 .onAttach <- function(...){
   data(AirPassengers)
-  data(AirPassengersX12)
-  if(Sys.info()[1]=="Windows"){
-    addTclPath(paste(searchpaths()[grep("x12",searchpaths())],"\\tcl",sep=""))
-  }else{
-    addTclPath(paste(searchpaths()[grep("x12",searchpaths())],"/tcl",sep=""))
-  }
-  tclRequire("BWidget")
-  #  X12GUI()
 }

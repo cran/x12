@@ -13,9 +13,9 @@
   \item{\dots}{further arguments (for the function edit).}
 }
 \details{
-  Opens the output file of x12 in an external editor
+  Opens the output file of x12 in an external editor.
 }
-\author{Alexander Kowarik}
+\author{Alexander Kowarik, Angelika Meraner}
 \seealso{\code{\link{x12}}}
 \examples{
   data(AirPassengersX12)

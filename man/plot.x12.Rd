@@ -13,16 +13,16 @@
   \item{\dots}{further arguments (currently ignored).}
 }
 \details{
-  Plots:
-  1: Original
-  2: Original Trend Adjusted
-  3: Log Original
-  4: Seasonal Factors
-  5: Seasonal Factors with SI Ratios
-  6: Spectrum Adjusted Original
-  7: Spectrum Seasonal Adjusted
-  8: Spectrum Irregular
-  9: Spectrum Residulas
+  Plots:\cr
+  1: Original\cr
+  2: Original Trend Adjusted\cr
+  3: Log Original\cr
+  4: Seasonal Factors\cr
+  5: Seasonal Factors with SI Ratios\cr
+  6: Spectrum Adjusted Original\cr
+  7: Spectrum Seasonal Adjusted\cr
+  8: Spectrum Irregular\cr
+  9: Spectrum Residulas\cr
 }
 \author{Alexander Kowarik}
 \seealso{\code{\link{x12}}}

@@ -1,13 +1,14 @@
 Package: x12
-Version: 0.2-0
-Date: 2011-05-16
-Title: X12 - wrapper function and GUI
-Author: Alexander Kowarik <alexander.kowarik@statistik.gv.at>
+Version: 1.0-0
+Date: 2012-04-02
+Title: X12 - wrapper function and structure for batch processing
+Author: Alexander Kowarik <alexander.kowarik@statistik.gv.at>, Angelika
+        Meraner
 Maintainer: Alexander Kowarik <alexander.kowarik@statistik.gv.at>
-Depends: R (>= 2.7.0),tcltk,stats,utils,grDevices
+Depends: R (>= 2.14.0),methods,stats,utils,grDevices,stringr
 Description: A wrapper function and GUI for the X12 binaries
 License: GPL (>= 2)
 URL: http://www.r-project.org
-Packaged: 2011-05-12 11:08:40 UTC; kowa$
+Packaged: 2012-04-02 08:06:20 UTC; alex
 Repository: CRAN
-Date/Publication: 2011-05-13 06:58:57
+Date/Publication: 2012-04-02 09:07:21
