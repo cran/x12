@@ -2,11 +2,11 @@
 \Rdversion{1.1}
 \docType{class}
 \alias{x12Single-class}
-\alias{summary,x12Single-method}
+\alias{x12Single}
 
 \title{Class \code{"x12Single"}}
 \description{
-Class consisting of all information for X12
+Class consisting of all information for \code{\link{X12}}.
 }
 \section{Objects from the Class}{
 Objects can be created by calls of the form \code{new("x12Single", ...)}.
@@ -14,23 +14,29 @@ Objects can be created by calls of the form \code{new("x12Single", ...)}.
 }
 \section{Slots}{
   \describe{
-    \item{\code{ts}:}{Object of class \code{"ts"} ~~ }
-    \item{\code{x12Parameter}:}{Object of class \code{"x12Parameter"} ~~ }
-    \item{\code{x12Output}:}{Object of class \code{"x12Output"} ~~ }
-    \item{\code{x12OldParameter}:}{Object of class \code{"list"} ~~ }
-    \item{\code{x12OldOutput}:}{Object of class \code{"list"} ~~ }
-    \item{\code{tsName}:}{Object of class \code{"characterOrNULL"} ~~ }
-    \item{\code{firstRun}:}{Object of class \code{"logical"} ~~ }
+    \item{\code{ts}:}{Object of class \code{\linkS4class{ts}}}
+    \item{\code{x12Parameter}:}{Object of class \code{\link{x12Parameter-class}}}
+    \item{\code{x12Output}:}{Object of class \code{\link{x12Output-class}}}
+    \item{\code{x12OldParameter}:}{Object of class \code{\linkS4class{list}}}
+    \item{\code{x12OldOutput}:}{Object of class \code{\linkS4class{list}}}
+    \item{\code{tsName}:}{Object of class \code{characterOrNULL}}
+    \item{\code{firstRun}:}{Object of class \code{\linkS4class{logical}}}
   }
 }
 \section{Methods}{
   \describe{
-    \item{cleanHistory}{\code{signature(object = "x12Single")}: ... }
-    \item{getP}{\code{signature(object = "x12Single")}: ... }
-    \item{prev}{\code{signature(object = "x12Single")}: ... }
-    \item{setP}{\code{signature(object = "x12Single")}: ... }
-    \item{summary}{\code{signature(object = "x12Single")}: ... }
-    \item{X12}{\code{signature(object = "x12Single")}: ... }
+    \item{\code{\link{cleanHistory}}}{\code{signature(object = "x12Single")}}
+    \item{\code{\link{getP}}}{\code{signature(object = "x12Single")}}
+    \item{\code{\link{prev}}}{\code{signature(object = "x12Single")}}
+    \item{\code{\link{setP}}}{\code{signature(object = "x12Single")}}
+    \item{\code{\link{summary}}}{\code{signature(object = "x12Single")}}
+    \item{\code{\link{X12}}}{\code{signature(object = "x12Single")}}
+    \item{\code{\link{plot}}}{\code{signature(object = "x12Single")}}
+	\item{\code{\link{crossVal}}}{\code{signature(object = "x12Single")}}
+	\item{\code{\link{plotSpec}}}{\code{signature(object = "x12Single")}}
+	\item{\code{\link{plotSeasFac}}}{\code{signature(object = "x12Single")}}    
+	\item{\code{\link{plotRsdAcf}}}{\code{signature(object = "x12Single")}}    
+    
 	 }
 }
 \author{
@@ -38,13 +44,15 @@ Alexander Kowarik}
 
 \seealso{
 \code{\link{X12}},
-\code{\linkS4class{x12Single}},
+%\code{\linkS4class{x12Single}},
 \code{\linkS4class{x12Batch}},
 \code{\linkS4class{x12Parameter}},
 \code{\linkS4class{x12List}},
 \code{\linkS4class{x12Output}},
 \code{\linkS4class{x12BaseInfo}},
-\code{\link{summary.x12}},\code{\link{x12}}
+%\code{\link{summary}},
+\code{\link{summary.x12}},
+\code{\link{x12}}
 }
 \examples{
 \dontrun{

@@ -2,10 +2,11 @@
 \Rdversion{1.1}
 \docType{class}
 \alias{x12BaseInfo-class}
+\alias{x12BaseInfo}
 
 \title{Class \code{"x12BaseInfo"}}
 \description{
-Baseinfo for use with the X12 function and classes
+Baseinfo for use with the \code{\link{X12}} function and classes.
 }
 \section{Objects from the Class}{
 Objects can be created by calls of the form \code{new("x12BaseInfo", x12path, x13path, use, showWarnings)}.
@@ -33,8 +34,8 @@ Alexander Kowarik
 \code{\linkS4class{x12Batch}},
 \code{\linkS4class{x12Parameter}},
 \code{\linkS4class{x12List}},
-\code{\linkS4class{x12Output}},
-\code{\linkS4class{x12BaseInfo}},
+\code{\linkS4class{x12Output}}
+%\code{\linkS4class{x12BaseInfo}},
 }
 \examples{
 showClass("x12BaseInfo")

@@ -1,24 +1,26 @@
 \name{plot-methods}
 \docType{methods}
 \alias{plot-methods}
-\alias{plot,ANY-method}
-\alias{plot,spectrum-method}
+%\alias{plot,ANY-method}
+%\alias{plot,spectrum-method}
 \alias{plot,x12Output-method}
 \alias{plot,x12Single-method}
-\title{ ~~ Methods for Function \code{plot} in Package \pkg{graphics} ~~}
+\alias{plot}
+
+\title{ ~~ Methods for Function \code{plot} in Package \pkg{x12} ~~}
 \description{
- ~~ Methods for function \code{plot} in package \pkg{graphics} ~~
+Plot function for \code{\link{X12}} output in package \pkg{x12}.
 }
 \section{Methods}{
 \describe{
 
-\item{\code{signature(x = "ANY")}}{
+%\item{\code{signature(x = "ANY")}}{
 %%  ~~describe this method here~~
-}
+%}
 
-\item{\code{signature(x = "spectrum")}}{
+%\item{\code{signature(x = "spectrum")}}{
 %%  ~~describe this method here~~
-}
+%}
 \item{\code{signature(x = "x12Output")}}{
 %%  ~~describe this method here~~
 }
@@ -27,9 +29,102 @@
 %%  ~~describe this method here~~
 }
 }}
-\author{Alexander Kowarik, Angelika Meraner}
-\examples{
 
+\usage{
+\S4method{plot}{x12Single}(x,y, original=TRUE, sa=FALSE, trend=FALSE, log_transform=FALSE,
+				ylab="Value", xlab="Date", main="TS",
+				col_original="black", col_sa="blue", col_trend="green",
+				lwd_original=1, lwd_sa=1, lwd_trend=1, lty_sa=1, lty_trend=1, ytop=1,
+				showAllout=FALSE, showAlloutLines=FALSE, showOut=NULL, annComp=TRUE, annCompTrend=TRUE,
+				col_ao="red", col_ls="red", col_tc="red", col_annComp="grey", lwd_out=1, cex_out=1.5,
+				pch_ao=4, pch_ls=2, pch_tc=23, plot_legend=TRUE,
+				forecast=FALSE, backcast=FALSE, showCI=TRUE,
+				col_fc="#2020ff", col_bc="#2020ff", col_ci="#d1d1ff", col_cishade="#d1d1ff",
+				lty_original=1, lty_fc=1, lty_bc=1, lty_ci=1, lwd_fc=1, lwd_bc=1, lwd_ci=1,
+				points_bc=FALSE, points_fc=FALSE, points_original=FALSE,
+				showLine=FALSE, col_line="grey", lty_line=3, ylim=NULL)
+\S4method{plot}{x12Output}(x,y, original=TRUE, sa=FALSE, trend=FALSE, log_transform=FALSE,
+				ylab="Value", xlab="Date", main="TS",
+				col_original="black", col_sa="blue", col_trend="green",
+				lwd_original=1, lwd_sa=1, lwd_trend=1, lty_sa=1, lty_trend=1, ytop=1,
+				showAllout=FALSE, showAlloutLines=FALSE, showOut=NULL, annComp=TRUE, annCompTrend=TRUE,
+				col_ao="red", col_ls="red", col_tc="red", col_annComp="grey", lwd_out=1, cex_out=1.5,
+				pch_ao=4, pch_ls=2, pch_tc=23, plot_legend=TRUE,
+				forecast=FALSE, backcast=FALSE, showCI=TRUE,
+				col_fc="#2020ff", col_bc="#2020ff", col_ci="#d1d1ff", col_cishade="#d1d1ff",
+				lty_original=1, lty_fc=1, lty_bc=1, lty_ci=1, lwd_fc=1, lwd_bc=1, lwd_ci=1,
+				points_bc=FALSE, points_fc=FALSE, points_original=FALSE,
+				showLine=FALSE, col_line="grey", lty_line=3, ylim=NULL)
+				%plot(x,y,...) 
+}
+
+\arguments{
+\item{x}{object of class \code{\link{x12Output-class}} or \code{\link{x12Single-class}}.}
+\item{y}{ignored.}
+\item{original}{logical defining whether the original time series should be plotted.}
+\item{sa}{logical defining whether the seasonally adjusted time series should be plotted.}
+\item{trend}{logical defining whether the trend should be plotted.}
+\item{log_transform}{logical defining whether the log transform should be plotted.}
+\item{showAllout}{logical defining whether all outliers should be plotted.}
+\item{showOut}{character in the format \code{"TypeYear.Seasonalperiod"} defining a specific outlier to be plotted.}
+\item{annComp}{logical defining whether an annual comparison should be performed for the outlier defined in \code{showOut}.}
+\item{forecast}{logical defining whether the forecasts should be plotted.}
+\item{backcast}{logical defining whether the backcasts should be plotted.}
+\item{showCI}{logical defining whether the prediction intervals should be plotted.}
+\item{ylab}{label of y-axis.}
+\item{xlab}{label of x-axis.}
+\item{main}{plot title.}
+\item{col_original}{color of the original time series.}
+\item{col_sa}{color of the seasonally adjusted time series.}
+\item{col_trend}{color of the trend.}
+\item{lwd_original}{line width of the original time series.}
+\item{lwd_sa}{line width of the seasonally adjusted time series.}
+\item{lwd_trend}{line width of the trend.}
+\item{lty_original}{line type of the original time series.}
+\item{lty_sa}{line type of the seasonally adjusted time series.}
+\item{lty_trend}{line type of the trend.}
+\item{ytop}{multiplication factor for \code{ylim}.}
+\item{showAlloutLines}{logical specifying if vertical lines should be plotted with the outliers.}
+\item{annCompTrend}{logical specifying if the trend of the annual comparison should be plotted.}
+\item{col_ao}{color of additive outliers.}
+\item{col_ls}{color of level shifts.}
+\item{col_tc}{color of transitory changes.}
+\item{col_annComp}{color of annual comparison.}
+\item{lwd_out}{line width of outliers.}
+\item{cex_out}{magnification factor for size of symbols used for plotting outliers.}
+\item{pch_ao}{symbols used for additive outliers.}
+\item{pch_ls}{symbols used for level shifts.}
+\item{pch_tc}{symbols used for transitory changes.}
+\item{plot_legend}{logical specifying if a legend should be plotted.}
+\item{col_fc}{color of forecasts.}
+\item{col_bc}{color of backcasts.}
+\item{col_ci}{color of prediction interval.}
+\item{col_cishade}{color of prediction interval shading.}
+\item{lty_fc}{line type of forecasts.}
+\item{lty_bc}{line type of backcasts.}
+\item{lty_ci}{line type of prediction interval.}
+\item{lwd_fc}{line width of forecasts.}
+\item{lwd_bc}{line width of backcasts.}
+\item{lwd_ci}{line width of prediction interval.}
+\item{points_bc}{logical specifying if backcasts should additionally be indicated with points.}
+\item{points_fc}{logical specifying if forecasts should additionally be indicated with points.}
+\item{points_original}{logical specifying if the original time series should additionally be indicated with points.}
+\item{showLine}{logical indicating if a boundary line should be drawn before/after fore-/backcasts.}
+\item{col_line}{color of \code{showLine}.}
+\item{lty_line}{line type of \code{showLine}.}
+\item{ylim}{range of the y-axis.}
+%\item{...}{xx}
+}
+
+\author{Alexander Kowarik, Angelika Meraner}
+
+\seealso{
+\code{\link{plotSpec}},
+\code{\link{plotSeasFac}},
+\code{\link{plotRsdAcf}}
+}
+
+\examples{
 \dontrun{
 s <- new("x12Single",ts=AirPassengers,tsName="air")
 s <- setP(s,list(estimate=TRUE,regvariables="AO1950.1",outlier="all",critical=list(LS=3.5,TC=2.5),backcast_years=1/2))

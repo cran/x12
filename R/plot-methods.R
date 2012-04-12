@@ -429,7 +429,7 @@ setMethod(f='plot',
 		lty_original=1,lty_fc=1,lty_bc=1,lty_ci=1,lwd_fc=1,lwd_bc=1,lwd_ci=1,
 		points_bc=FALSE,points_fc=FALSE,points_original=FALSE,
 		showLine=FALSE,col_line="grey",lty_line=3,ylim=NULL){
-      plot(x@x12Output,y=y,original=original,sa=sa,trend=trend,
+      plot(x@x12Output,y=NULL,original=original,sa=sa,trend=trend,
           log_transform=log_transform,
           ylab=ylab,xlab=xlab,
           main=main,
@@ -659,7 +659,35 @@ setMethod(f='plotSpec',
 		}
 )
 
-
+setMethod(
+		f='plotSpec',
+		signature=signature(x = "spectrum"),definition=function(x,frequency,
+				xlab="Frequency",ylab="Decibels",
+				main="Spectrum",highlight=TRUE,
+				col_bar="darkgrey",col_seasonal="red",col_td="blue",
+				lwd_bar=4,lwd_seasonal=1,lwd_td=1,plot_legend=TRUE)
+		{
+#			myfun <- function(x) deparse(substitute(x)) 
+#		which=NULL
+#			if(main=="Spectrum" && !is.null(which)){
+#				if(which=="sa")
+#					main <- "Spectrum of the Seasonally Adjusted Series"
+#				else if(which=="original")
+#					main <- "Spectrum of the Original Series"      
+#				else if(which=="irregular")
+#					main <- "Spectrum of the Irregular"
+#				else if(which=="residuals")
+#					main <- "Spectrum of the RegARIMA Residuals"   
+#			}
+			
+			f<-frequency
+			#out[[which]]$frequency
+			plot_spectrum_work(x@frequency,x@spectrum,xlab=xlab,ylab=ylab,f=f,
+					main=main,highlight=highlight,
+					col_bar=col_bar,col_seasonal=col_seasonal,col_td=col_td,
+					lwd_bar=lwd_bar,lwd_seasonal=lwd_seasonal,lwd_td=lwd_td,plot_legend=plot_legend)
+			
+		})
 
 setGeneric("plotFbcast",
 		function(object, ...) { standardGeneric("plotFbcast")} )

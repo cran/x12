@@ -2,10 +2,11 @@
 \Rdversion{1.1}
 \docType{class}
 \alias{x12List-class}
+\alias{x12List}
 
 \title{Class \code{"x12List"}}
 \description{
-Support class for x12Batch containing multiple x12Single
+Support class for \code{\link{x12Batch-class}} containing multiple \code{\link{x12Single-class}}.
 }
 \section{Objects from the Class}{
 Objects can be created by calls of the form \code{new("x12List", ...)}.
@@ -18,10 +19,10 @@ Objects can be created by calls of the form \code{new("x12List", ...)}.
 }
 \section{Extends}{
 Class \code{"\linkS4class{list}"}, from data part.
-Class \code{"\linkS4class{vector}"}, by class "list", distance 2.
+Class \code{"\linkS4class{vector}"}, by class \code{"list"}, distance 2.
 }
 \section{Methods}{
-No methods defined with class "x12List" in the signature.
+No methods defined with class \code{"x12List"} in the signature.
 }
 \author{
 Alexander Kowarik
@@ -32,10 +33,11 @@ Alexander Kowarik
 \code{\linkS4class{x12Single}},
 \code{\linkS4class{x12Batch}},
 \code{\linkS4class{x12Parameter}},
-\code{\linkS4class{x12List}},
+%\code{\linkS4class{x12List}},
 \code{\linkS4class{x12Output}},
-\code{\linkS4class{x12BaseInfo}},
+\code{\linkS4class{x12BaseInfo}}
 }
+
 \examples{
 showClass("x12List")
 }

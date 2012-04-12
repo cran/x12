@@ -6,7 +6,7 @@
 \alias{plotRsdAcf,x12Single-method}
 \title{ ~~ Methods for Function \code{plotRsdAcf} in Package \pkg{x12} ~~}
 \description{
- ~~ Methods for function \code{plotRsdAcf} in package \pkg{x12} ~~
+Plot of the (partial) autocorrelations of the (squared) residuals with function \code{plotRsdAcf} in package \pkg{x12}.
 }
 \section{Methods}{
 \describe{
@@ -19,8 +19,44 @@
 %%  ~~describe this method here~~
 }
 }}
-\examples{
 
+\usage{
+\S4method{plotRsdAcf}{x12Output}(x, which="acf",
+				xlab="Lag", ylab="ACF",
+				main="default", col_acf="darkgrey", lwd_acf=4,
+				col_ci="blue", lt_ci=2, ylim="default", ...)
+\S4method{plotRsdAcf}{x12Single}(x, which="acf",
+				xlab="Lag", ylab="ACF",
+				main="default", col_acf="darkgrey", lwd_acf=4,
+				col_ci="blue", lt_ci=2, ylim="default", ...)
+				
+}
+
+\arguments{
+\item{x}{object of class \code{\link{x12Output-class}} or \code{\link{x12Single-class}}.} 
+\item{which}{character specifying the type of autocorrelation of
+  the residuals that should be plotted, i.e. the autocorrelations or partial autocorrelations 
+  of the residuals or the autocorrelations of the squared residuals (\code{"acf"}, \code{"pacf"}, \code{"acf2"}).}
+\item{xlab}{label of the x-axis.} 
+\item{ylab}{label of the y-axis.} 
+\item{main}{plot title.}
+\item{col_acf}{color of the autocorrelations.} 
+\item{lwd_acf}{line width of the autocorrelations.} 
+\item{col_ci}{color of the +- 2 standard error limits.} 
+\item{lt_ci}{line type of the +- 2 standard error limits.} 
+\item{ylim}{range of the y-axis.}
+\item{...}{ignored.}
+}	
+
+\author{Alexander Kowarik, Angelika Meraner}
+
+\seealso{
+\code{\link{X12}},
+\code{\link{plot}},
+\code{\link{plotSpec}},
+\code{\link{plotSeasFac}}}
+		
+\examples{
 \dontrun{
 s <- new("x12Single",ts=AirPassengers,tsName="air")
 s <- setP(s,list(estimate=TRUE,regvariables="AO1950.1",outlier="all",critical=list(LS=3.5,TC=2.5),backcast_years=1/2))

@@ -4,11 +4,11 @@
 \alias{x12Batch-class}
 \alias{dim,x12Batch-method}
 \alias{length,x12Batch-method}
-\alias{summary,x12Batch-method}
+\alias{x12Batch}
 
 \title{Class \code{"x12Batch"}}
 \description{
-Concatenation of multiple x12Single objects
+Concatenation of multiple \code{\link{x12Single-class}} objects.
 }
 \section{Objects from the Class}{
 Objects can be created by calls of the form \code{new("x12Batch", tsList, tsName, x12BaseInfo)}.
@@ -40,12 +40,14 @@ Alexander Kowarik
 \seealso{
 \code{\link{X12}},
 \code{\linkS4class{x12Single}},
-\code{\linkS4class{x12Batch}},
+%\code{\linkS4class{x12Batch}},
 \code{\linkS4class{x12Parameter}},
 \code{\linkS4class{x12List}},
 \code{\linkS4class{x12Output}},
 \code{\linkS4class{x12BaseInfo}},
-\code{\link{summary.x12}},\code{\link{x12}}
+%\code{\link{summary}},
+\code{\link{summary.x12}},
+\code{\link{x12}}
 }
 \examples{
 #object containing 4 time series and the corresponding parameters and output

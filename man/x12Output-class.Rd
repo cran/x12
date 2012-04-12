@@ -2,45 +2,55 @@
 \Rdversion{1.1}
 \docType{class}
 \alias{x12Output-class}
-\alias{summary,x12Output-method}
+\alias{x12Output}
 
 \title{Class \code{"x12Output"}}
 \description{
-Output class for X12
+Output class for \code{\link{X12}}.
 }
 \section{Objects from the Class}{
 Objects can be created by calls of the form \code{new("x12Output", ...)}.
 %%  ~~ describe objects here ~~ 
 }
+
 \section{Slots}{
   \describe{
-    \item{\code{a1}:}{Object of class \code{"ts"} ~~ }
-    \item{\code{d10}:}{Object of class \code{"ts"} ~~ }
-    \item{\code{d11}:}{Object of class \code{"ts"} ~~ }
-    \item{\code{d12}:}{Object of class \code{"ts"} ~~ }
-    \item{\code{d13}:}{Object of class \code{"ts"} ~~ }
-    \item{\code{d16}:}{Object of class \code{"ts"} ~~ }
-    \item{\code{c17}:}{Object of class \code{"ts"} ~~ }
-    \item{\code{d9}:}{Object of class \code{"ts"} ~~ }
-    \item{\code{e2}:}{Object of class \code{"ts"} ~~ }
-    \item{\code{d8}:}{Object of class \code{"ts"} ~~ }
-    \item{\code{b1}:}{Object of class \code{"ts"} ~~ }
-    \item{\code{sp0}:}{Object of class \code{"spectrum"} ~~ }
-    \item{\code{sp1}:}{Object of class \code{"spectrum"} ~~ }
-    \item{\code{sp2}:}{Object of class \code{"spectrum"} ~~ }
-    \item{\code{spr}:}{Object of class \code{"spectrum"} ~~ }
-    \item{\code{forecast}:}{Object of class \code{"fbcast"} ~~ }
-    \item{\code{backcast}:}{Object of class \code{"fbcast"} ~~ }
-    \item{\code{dg}:}{Object of class \code{"list"} ~~ }
+    \item{\code{a1}:}{Object of class \code{"ts"} - the original time series.}
+    \item{\code{d10}:}{Object of class \code{"ts"} - the final seasonal factors.}
+    \item{\code{d11}:}{Object of class \code{"ts"} - the final seasonally adjusted data.}
+    \item{\code{d12}:}{Object of class \code{"ts"} - the final trend cycle.}
+    \item{\code{d13}:}{Object of class \code{"ts"} - the final irregular components.}
+    \item{\code{d16}:}{Object of class \code{"ts"} - the combined adjustment factors.}
+    \item{\code{c17}:}{Object of class \code{"ts"} - the final weights for the irregular component.}
+    \item{\code{d9}:}{Object of class \code{"ts"} - the final replacements for the SI ratios.}
+    \item{\code{e2}:}{Object of class \code{"ts"} - the differenced, transformed, seasonally adjusted data.}
+    \item{\code{d8}:}{Object of class \code{"ts"} - the final unmodified SI ratios.}
+    \item{\code{b1}:}{Object of class \code{"ts"} - the prior adjusted original series.}
+    \item{\code{sp0}:}{Object of class \code{"spectrum"} - the spectrum of the original series.}
+    \item{\code{sp1}:}{Object of class \code{"spectrum"} - the spectrum of the differenced seasonally adjusted series.}
+    \item{\code{sp2}:}{Object of class \code{"spectrum"} - the spectrum of modified irregular series.}
+    \item{\code{spr}:}{Object of class \code{"spectrum"} - the spectrum of the regARIMA model residuals.}
+    \item{\code{forecast}:}{Object of class \code{"fbcast"} - the  point forecasts with prediction intervals}
+    \item{\code{backcast}:}{Object of class \code{"fbcast"} - the  point backcasts with prediction intervals}
+    \item{\code{dg}:}{Object of class \code{"list"}, containing several seasonal adjustment and regARIMA modeling diagnostics, i.e.:\cr
+\code{x11regress, transform, samode, seasonalma, trendma, arimamdl, automdl, regmdl, nout, nautoout, 
+nalmostout, almostoutlier, crit, outlier, userdefined, autooutlier, peaks.seas, peaks.td, id.seas, 
+id.rsdseas, spcrsd, spcori, spcsa, spcirr, q, q2, nmfail, loglikelihood, aic, aicc, bic, hq, aape,
+autotransform, ifout, rsd.acf, rsd.pacf, rsd.acf2,...}}
     \item{\code{seats}:}{Object of class \code{"logical"} ~~ }
-    \item{\code{file}:}{Object of class \code{"character"} ~~ }
-    \item{\code{tblnames}:}{Object of class \code{"character"} ~~ }
-    \item{\code{Rtblnames}:}{Object of class \code{"character"} ~~ }
+    \item{\code{file}:}{Object of class \code{"character"} - path to the output directory and filename}
+    \item{\code{tblnames}:}{Object of class \code{"character"} - tables read into R}
+    \item{\code{Rtblnames}:}{Object of class \code{"character"} - names of tables read into R}
   }
 }
+
 \section{Methods}{
   \describe{
-    \item{summary}{\code{signature(object = "x12Output")}: ... }
+    \item{\link{summary}}{\code{signature(object = "x12Output")}: ... }
+    \item{\link{plot}}{\code{signature(object = "x12Output")}: ... }
+	\item{\link{plotSpec}}{\code{signature(object = "x12Output")}: ... }
+	\item{\link{plotSeasFac}}{\code{signature(object = "x12Output")}: ... }    
+	\item{\link{plotRsdAcf}}{\code{signature(object = "x12Output")}: ... }    
 	 }
 }
 \author{
@@ -55,6 +65,9 @@ Alexander Kowarik
 \code{\linkS4class{x12List}},
 \code{\linkS4class{x12Output}},
 \code{\linkS4class{x12BaseInfo}},
+%\code{\link{summary}},
+\code{\link{summary.x12}},
+\code{\link{x12}}
 }
 \examples{
 data(AirPassengersX12)

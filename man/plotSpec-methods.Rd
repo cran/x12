@@ -4,9 +4,10 @@
 \alias{plotSpec-methods}
 \alias{plotSpec,x12Output-method}
 \alias{plotSpec,x12Single-method}
+\alias{plotSpec,spectrum-method}
 \title{ ~~ Methods for Function \code{plotSpec} in Package \pkg{x12} ~~}
 \description{
- ~~ Methods for function \code{plotSpec} in package \pkg{x12} ~~
+Spectral plots with function \code{plotSpec} in package \pkg{x12}.
 }
 \section{Methods}{
 \describe{
@@ -26,11 +27,42 @@
 				lwd_bar=4,lwd_seasonal=1,lwd_td=1,plot_legend=TRUE)}}{
 %%  ~~describe this method here~~
 }
-}}
-\arguments{
-  \item{x}{an object of class \code{"x12Output"} or \code{"x12Single"}.}
-  \item{which}{a string defining the executable of the editor to use.}
+\item{\code{signature(x = "spectrum",frequency,
+				xlab="Frequency",ylab="Decibels",
+				main="Spectrum",
+				col_bar="darkgrey",col_seasonal="red",col_td="blue",
+				lwd_bar=4,lwd_seasonal=1,lwd_td=1,plot_legend=TRUE)}}{
+%%  ~~describe this method here~~
 }
+}}
+
+\arguments{
+\item{x}{an object of class \code{\link{x12Output-class}}, \code{\link{x12Single-class}} or \code{\link{spectrum-class}}.}
+\item{which}{a string defining the executable of the editor to use (\code{"sa"} for the Spectrum of the Seasonally Adjusted Series,
+\code{"original"} for the Spectrum of the Original Series, \code{"irregular"} for the Spectrum of the Irregular Series
+and \code{"residuals"} for the Spectrum of the RegARIMA Residuals).}
+\item{frequency}{frequency of the time series (has to be specified for objects of class \code{"spectrum"} only).}
+\item{xlab}{label of the x-axis.} 
+\item{ylab}{label of the y-axis.} 
+\item{main}{plot title.} 
+\item{col_bar}{color of bars.} 
+\item{col_seasonal}{color of seasonal frequencies.} 
+\item{col_td}{color of trading day frequencies.} 
+\item{lwd_bar}{line width of bars.} 
+\item{lwd_seasonal}{line width of seasonal frequencies.} 
+\item{lwd_td}{line width of trading day frequencies.} 
+\item{plot_legend}{logical specifying if a legend should be plotted.}
+}
+
+\author{Alexander Kowarik, Angelika Meraner}
+
+\seealso{
+\code{\link{X12}},
+\code{\link{plot}},
+\code{\link{plotSeasFac}},
+\code{\link{plotRsdAcf}}
+}
+
 \examples{
 
 \dontrun{

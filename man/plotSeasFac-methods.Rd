@@ -6,7 +6,7 @@
 \alias{plotSeasFac,x12Single-method}
 \title{ ~~ Methods for Function \code{plotSeasFac} in Package \pkg{x12} ~~}
 \description{
- ~~ Methods for function \code{plotSeasFac} in package \pkg{x12} ~~
+Seasonal factor plots with function \code{plotSeasFac} in package \pkg{x12}.
 }
 \section{Methods}{
 \describe{
@@ -19,6 +19,46 @@
 %%  ~~describe this method here~~
 }
 }}
+
+\usage{
+\S4method{plotSeasFac}{x12Output}(x,SI_Ratios=TRUE, ylab="Value", xlab="",
+				lwd_seasonal=1, col_seasonal="black", lwd_mean=1, col_mean="blue", col_siratio="darkgreen",
+				col_replaced="red", cex_siratio=.9, cex_replaced=.9, SI_Ratios_replaced=TRUE, plot_legend=TRUE, ...)
+\S4method{plotSeasFac}{x12Single}(x,SI_Ratios=TRUE, ylab="Value", xlab="",
+				lwd_seasonal=1, col_seasonal="black", lwd_mean=1, col_mean="blue", col_siratio="darkgreen",
+				col_replaced="red", cex_siratio=.9, cex_replaced=.9, SI_Ratios_replaced=TRUE, plot_legend=TRUE, ...)
+
+				
+}
+
+
+\arguments{
+\item{x}{object of class \code{\link{x12Output-class}} or \code{\link{x12Single-class}}.} 
+\item{SI_Ratios}{logical specifying if the SI ratios should be plotted.} 
+\item{ylab}{label of the y-axis.} 
+\item{xlab}{label of the x-axis.} 
+\item{lwd_seasonal}{line width of the seasonal factors.} 
+\item{col_seasonal}{color of the seasonal factors.} 
+\item{lwd_mean}{line width of the mean.} 
+\item{col_mean}{color of the mean.} 
+\item{col_siratio}{color of the SI ratios.} 
+\item{col_replaced}{color of the replaced SI ratios.} 
+\item{cex_siratio}{magnification factor for the size of the symbols used for plotting the SI ratios.} 
+\item{cex_replaced}{magnification factor for the size of the symbols used for plotting the replaced SI ratios.} 
+\item{SI_Ratios_replaced}{logical specifying if the replaced SI ratios should be plotted.} 
+\item{plot_legend}{logical specifying if a legend should be plotted.} 
+\item{...}{ignored.}
+}
+
+\author{Alexander Kowarik, Angelika Meraner}
+
+\seealso{
+\code{\link{X12}},
+\code{\link{plot}},
+\code{\link{plotSpec}},
+\code{\link{plotRsdAcf}}
+}
+
 \examples{
 
 \dontrun{

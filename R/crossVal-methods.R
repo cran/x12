@@ -11,7 +11,7 @@ setMethod(
 				lty_original=1,lty_fc=1,lty_bc=1,lty_ci=1,
 				lwd_original=1,lwd_fc=1,lwd_bc=1,lwd_ci=1,ytop=1,
 				points_bc=FALSE,points_fc=FALSE,points_original=FALSE,
-				showLine=FALSE,col_line="grey",lty_line=3,
+				showLine=TRUE,col_line="grey",lty_line=3,
 				ylab="Value",xlab="Date") {
 		
 		fbcastP<-getP(x12Parameter,whichP=list("forecast_years","backcast_years"))
@@ -126,7 +126,7 @@ setMethod(
 				lty_original=1,lty_fc=1,lty_bc=1,lty_ci=1,
 				lwd_original=1,lwd_fc=1,lwd_bc=1,lwd_ci=1,ytop=1,
 				points_bc=FALSE,points_fc=FALSE,points_original=FALSE,
-				showLine=FALSE,col_line="grey",lty_line=3,
+				showLine=TRUE,col_line="grey",lty_line=3,
 				ylab="Value",xlab="Date") {
 			
 			crossVal(object@ts,object@x12Parameter,

@@ -10,19 +10,36 @@
 \alias{cleanHistory,x12Single-method}
 \title{ ~~ Methods for Function \code{prev} and \code{cleanHistory} in Package \pkg{x12} ~~}
 \description{
- ~~ Methods for function \code{prev} in package \pkg{x12} ~~
+Function \code{prev} in package \pkg{x12} reverts to previous parameter settings and output.\cr
+Function \code{cleanHistory} resets \code{x12OldParameter} and \code{x12OldOutput}.
 }
 \section{Methods}{
 \describe{
+\item{\code{signature(object = "x12Single")}}{
+%%  ~~describe this method here~~
+}
 
 \item{\code{signature(object = "x12Batch")}}{
 %%  ~~describe this method here~~
 }
-
-\item{\code{signature(object = "x12Single")}}{
-%%  ~~describe this method here~~
-}
 }}
+
+\usage{
+\S4method{prev}{x12Single}(object,n=NULL)
+\S4method{prev}{x12Batch}(object,index=NULL,n=NULL)
+\S4method{cleanHistory}{x12Single}(object)
+\S4method{cleanHistory}{x12Batch}(object,index=NULL)
+}
+
+\arguments{
+\item{object}{object of class \code{\link{x12Single-class}} or \code{\link{x12Batch-class}}.}
+\item{n}{index corresponding to a previous run.}
+\item{index}{index corresponding to (an) object(s) of class \code{"x12Single"}.}
+}
+
+\seealso{\code{\link{X12}}}
+
+
 \examples{
 data(AirPassengersX12)
 summary(AirPassengersX12)

@@ -34,10 +34,12 @@ afterwards the output is read into R.
   \item{arima}{vector of length 3, defining the arima parameters.}
   \item{sarima}{vector of length 3, defining the sarima parameters.}
   \item{automdl}{\code{TRUE}/\code{FALSE} for activating auto modeling.}
-  \item{acceptdefault}{?}
-  \item{balanced}{?}
-  \item{maxorder}{maximum order for automdl.}
-  \item{maxdiff}{maximum diff. order for automdl.}
+  \item{acceptdefault}{logical for \code{automdl} defining whether the default model should be chosen if the Ljung-Box Q statistic 
+  for its model residuals is acceptable.}
+  \item{balanced}{logical for \code{automdl} defining whether the automatic model procedure will tend towards balanced
+	models. \code{TRUE} yields the same preference as the TRAMO program.}
+  \item{maxorder}{maximum order for \code{automdl}.}
+  \item{maxdiff}{maximum diff. order for \code{automdl}.}
   \item{regvariables}{character or character vector representing the names of the regression variables.}
   \item{reguser}{character or character vector defining the user parameters in the regression argument.}
   \item{regfile}{path to the file containing the data values of all \code{reguser} variables.}

@@ -29,5 +29,8 @@
 %%  ~~describe this method here~~
 }
 }}
+
+\seealso{\code{\link{X12}}}
+
 \keyword{methods}
 \keyword{ ~~ other possible keyword(s) ~~ }
