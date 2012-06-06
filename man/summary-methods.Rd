@@ -32,11 +32,11 @@ Delivers a diagnostics summary for \code{\link{X12}} output.
 
 \usage{
 \S4method{summary}{x12Output}(object, fullSummary=FALSE, spectra.detail=FALSE, almostout=FALSE, rsd.autocorr=NULL,
-                      q2=FALSE, likelihood.stat=FALSE, aape=FALSE, id.rsdseas=FALSE)
+                      q2=FALSE, likelihood.stat=FALSE, aape=FALSE, id.rsdseas=FALSE,print=TRUE)
 \S4method{summary}{x12Single}(object, fullSummary=FALSE, spectra.detail=FALSE, almostout=FALSE, rsd.autocorr=NULL,
-                      q2=FALSE, likelihood.stat=FALSE, aape=FALSE, id.rsdseas=FALSE, oldOutput=NULL)                      
+                      q2=FALSE, likelihood.stat=FALSE, aape=FALSE, id.rsdseas=FALSE, oldOutput=NULL,print=TRUE)                      
 \S4method{summary}{x12Batch}(object, fullSummary=FALSE, spectra.detail=FALSE, almostout=FALSE, rsd.autocorr=NULL,
-                      q2=FALSE, likelihood.stat=FALSE, aape=FALSE, id.rsdseas=FALSE, oldOutput=NULL)                      
+                      q2=FALSE, likelihood.stat=FALSE, aape=FALSE, id.rsdseas=FALSE, oldOutput=NULL,print=TRUE)                      
 }
 
 \arguments{
@@ -55,7 +55,7 @@ Delivers a diagnostics summary for \code{\link{X12}} output.
   \item{id.rsdseas}{logical defining whether the presence/absence of residual seasonality should be indicated.}
   \item{oldOutput}{integer specifying the number of previous \code{X12} runs stored in the \code{x12OldOutput} slot of
   an \code{x12Single-class} or an \code{x12Batch-class} object that should be included in the summary.}
-
+  \item{print}{TRUE/FALSE if the summary should be printed.}
 }
 
 \author{Alexander Kowarik, Angelika Meraner}
@@ -67,13 +67,30 @@ Delivers a diagnostics summary for \code{\link{X12}} output.
 \examples{
 
 \dontrun{
+# Summary of an "x12Single" object
+x12path <- ".../x12a.exe"
 s <- new("x12Single",ts=AirPassengers,tsName="air")
 s <- setP(s,list(estimate=TRUE,regvariables="AO1950.1",outlier="all",critical=list(LS=3.5,TC=2.5),backcast_years=1/2))
 s <- X12(s)
-summary(s)
+summary.output<-summary(s)
 s <- X12(setP(s,list(arima=c(0,1,1),sarima=c(0,2,1))))
-summary(s,oldOutput=1)
+summary.output<-summary(s,oldOutput=1)
 s <- X12(setP(s,list(arima=c(0,1,1),sarima=c(1,0,1))))
-summary(s,fullSummary=TRUE,oldOutput=2)
+summary.output<-summary(s,fullSummary=TRUE,oldOutput=2)
+
+# Summary of an "x12Batch" object
+xb <- new("x12Batch",list(AirPassengers,AirPassengers,
+				AirPassengers),tsName=c("air1","air2","air3"))
+xb <- X12(xb)
+xb <- setP(xb,list(arima=c(1,1,0),sarima=c(1,1,0)),1)
+xb <- X12(xb)
+xb <- setP(xb,list(regvariables=c("AO1955.5","AO1956.1","ao1959.3")),1)
+xb <- setP(xb,list(regvariables=c("AO1955.4")),2)
+xb<- X12(xb)
+xb <- setP(xb,list(outlier="all"))
+xb <- setP(xb,list(critical=list(LS=3.5,TC=2.5)),1)
+xb <- setP(xb,list(regvariables=c("lpyear")),3)
+xb<- X12(xb)
+summary.output<-summary(xb,oldOutput=3)
 }
 }

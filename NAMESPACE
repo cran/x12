@@ -1,4 +1,5 @@
 #S3 part
+#export("x12","plot.x12","summary.x12","summary.output.x12","read.spc")
 export("x12","plot.x12","summary.x12","read.spc")
 S3method(plot, x12)
 S3method(print, x12)
@@ -8,4 +9,4 @@ S3method(summary, x12)
 importFrom("graphics", plot)
 exportClasses(x12Single,x12Batch,x12Output,x12Parameter,x12BaseInfo,diagnostics,x12List,fbcast,crossValidation)
 ## All methods for imported generics:
-exportMethods(X12,summary,setP,getP,prev,cleanHistory,dim,length,crossVal,plot,plotSpec,plotRsdAcf,plotSeasFac,plotFbcast,saveP,loadP)
+exportMethods(X12,summary,setP,getP,prev,cleanHistory,dim,length,crossVal,plot,plotSpec,plotRsdAcf,plotSeasFac,saveP,loadP,times)

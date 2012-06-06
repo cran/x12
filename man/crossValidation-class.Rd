@@ -17,7 +17,7 @@ Objects can be created by calls of the form \code{new("crossValidation", ...)}.
   }
 }
 \author{
-Alexander Kowarik
+Alexander Kowarik, Angelika Meraner
 }
 \examples{
 showClass("crossValidation")

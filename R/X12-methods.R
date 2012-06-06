@@ -92,6 +92,10 @@ setMethod(
     f='X12',
     signature=signature(object = "x12Batch"),
     definition=function(object,forceRun=FALSE) {
+      if(any(ls(1)=="x12path"))
+        object@x12BaseInfo@x12path <- get("x12path",as.environment(1))
+      else
+        stop("Please enter a x12path")
       starting.time <- Sys.time()
       for(i in 1:length(object@x12List)){
         object@x12List[[i]] <- X12(object@x12List[[i]],x12BaseInfo=object@x12BaseInfo,forceRun=forceRun)

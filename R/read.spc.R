@@ -18,7 +18,7 @@ read.spcS <- function(file,filename=TRUE){
     x <- gsub(word,"",x,ignore.case=TRUE)
     x <- gsub("=","",x)
     x <- gsub("\\(","",x)
-    x <- gsub("\\)","",x)
+    x <- gsub("\\)"," ",x)
     x <- gsub("\\'","",x)
     x <- gsub("\\\"","",x)
     x <- gsub("\\{","",x)
@@ -223,8 +223,12 @@ read.spcS <- function(file,filename=TRUE){
     arima <- Lines[ind[1]:ind[2]]
     Lines <- Lines[-c(ind[1]:ind[2])]
     modelX <-  whichgrep(arima,"model")
+    
     if(length(modelX)>0){
-      model <- as.numeric(gsub1(arima[modelX],"model"))
+      #aa <<- arima[modelX]
+      arr <- arima[modelX]
+      arr <- gsub(","," ",arr)
+      model <- as.numeric(gsub1(arr,"model"))
       if(length(model)==6)
         para <- setP(para,list(arima=model[1:3],sarima=model[4:6]))
       else if(length(model)==3)

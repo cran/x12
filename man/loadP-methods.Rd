@@ -10,9 +10,9 @@
 \alias{saveP,x12Single-method}
 \alias{saveP}
 \alias{loadP}
-\title{ ~~ Methods for Function \code{loadP}  ~~}
+\title{ ~~ Methods for Function \code{loadP} and \code{saveP} ~~}
 \description{
- ~~ Methods for function \code{loadP}  ~~
+Functions \code{loadP} and \code{saveP} load and save parameter settings.
 }
 \section{Methods}{
 \describe{

@@ -3,6 +3,9 @@ summary.x12 <- function(object,fullSummary=FALSE,spectra.detail=FALSE,almostout=
 }
 summaryworkhorse <- function(x,fullSummary=FALSE,spectra.detail=FALSE,almostout=FALSE,rsd.autocorr=NULL,q2=FALSE,likelihood.stat=FALSE,aape=FALSE,id.rsdseas=FALSE){
   #cat("File: \"",x$file,"\"",sep="","\n")	
+	if(length(nchar(unlist(x$outlier)))==0)
+		x$outlier<-"-"	
+	
 	if(fullSummary){
 	  spectra.detail=TRUE
 	  almostout=TRUE
@@ -154,7 +157,8 @@ summaryworkhorse <- function(x,fullSummary=FALSE,spectra.detail=FALSE,almostout=
     rest<-unlist(lapply(strsplit(as.character(x$regmdl),"+",fixed=TRUE),function(x)gsub("^\\s+|\\s+$", "",x)))
     rest<-names(x)[which(names(x)%in%rest)]
     liste <- c("outlier","userdefined","leapyear","td",rest,"autooutlier")#,"almostoutlier")
-    empty <- which(unlist(lapply(1:length(x),function(y)any(x[[y]]=="-"))))
+	liste<-liste[which(liste%in%names(x))]
+	empty <- which(unlist(lapply(1:length(x),function(y)any(x[[y]]=="-"))))
     res <- as.data.frame(do.call(rbind,lapply(which(!liste %in% names(x[empty])),function(j){
                   if(!any(grepl(names(x[liste[j]]),names(x[[liste[j]]])))){
                     names(x[[liste[j]]])<-paste(names(x[liste[j]]),"_",names(x[[liste[j]]]),sep="")	

@@ -54,7 +54,7 @@ autotransform, ifout, rsd.acf, rsd.pacf, rsd.acf2,...}}
 	 }
 }
 \author{
-Alexander Kowarik
+Alexander Kowarik, Angelika Meraner
 }
 
 \seealso{

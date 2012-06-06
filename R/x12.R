@@ -19,6 +19,9 @@ unlink(paste(dirname(file),"/gra",sep=""),recursive=TRUE)
 if((length(tso)/period)>15 && !is.null(backcast_years) && !showWarnings){
 cat("\nWarning: x12 cannot produce backcasts for time series that are more than 15 years long!\n")
 }
+#if(forecast_years==0 && !estimate){
+#cat("\nWarning: No proper run of x12! Check your parameter settings.\n")	
+#}
 if(!is.null(addLines)){ #start option addLines
 	header <- vector()
   header[length(header)+1] <- "series {"
