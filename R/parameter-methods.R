@@ -340,7 +340,8 @@ setMethod(
     f='saveP',
     signature=signature(object = "x12Single"),
     definition=function(object,file) {
-      save(object@x12Parameter,file=file)
+      out=object@x12Parameter
+      save(out,file=file)
     }
 )
 setMethod(

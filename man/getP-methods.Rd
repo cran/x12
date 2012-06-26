@@ -11,10 +11,11 @@
 \alias{setP,x12Parameter-method}
 \alias{setP,x12Single-method}
 
-\title{ ~~ Methods for Function \code{getP} and \code{setP} in Package \pkg{x12} ~~}
+\title{ \code{getP} and \code{setP} for setting and loading parameters}
 \description{
- ~~ Methods for function \code{getP} in package \pkg{x12} ~~
-}
+ \code{getP} and \code{setP} for setting and loading parameters from a 
+ \code{\link{x12Single-class}}, \code{\link{x12Batch-class}} or \code{\link{x12Parameter-class}} object.
+ }
 \section{Methods}{
 \describe{
 
@@ -30,8 +31,52 @@
 %%  ~~describe this method here~~
 }
 }}
+\usage{
+\S4method{getP}{x12Single}(object, whichP)
+\S4method{getP}{x12Batch}(object, whichP,index=NULL)
+\S4method{getP}{x12Parameter}(object, whichP)
+\S4method{setP}{x12Single}(object, listP)
+\S4method{setP}{x12Batch}(object, listP,index=NULL)
+\S4method{setP}{x12Parameter}(object, listP)
+}
+\arguments{
+\item{object}{object of class \code{\link{x12Single-class}}, \code{\link{x12Batch-class}} or \code{\link{x12Parameter-class}}.}
+\item{whichP}{character vector with the names of the parameters to extract}
+\item{listP}{named list of parameters to change}
+\item{index}{index of the series in \code{\link{x12Batch-class}} to change or extract (NULL=all)}
+}
 
-\seealso{\code{\link{X12}}}
+\seealso{\code{\link{X12}}, \code{\link{x12Batch}}}
+\examples{
+\dontrun{
+#Create new batch object with 4 time series
+xb <- new("x12Batch",list(AirPassengers,AirPassengers,AirPassengers,AirPassengers))
+# change the automdl to FALSE in all 4 elements
+xb <- setP(xb,list(automdl=FALSE))
+#change the arima and sarima setting for the first ts object
+xb <- setP(xb,list(arima=c(1,1,0),sarima=c(1,1,0)),1)
+#change the arima and sarima setting for the second ts object
+xb <- setP(xb,list(arima=c(0,1,1),sarima=c(0,1,1)),2)
+#change the arima and sarima setting for the third ts object
+xb <- setP(xb,list(arima=c(0,1,1),sarima=c(1,1,1)),3)
+#change the arima and sarima setting for the fourth ts object
+xb <- setP(xb,list(arima=c(1,1,1),sarima=c(1,1,1)),4)
+#run X12 on all series
+xb <- X12(xb)
+summary(xb)
+#Set automdl=TRUE for the first ts
+xb <- setP(xb,list(automdl=TRUE),1)
+#rerun X12 on all series (the binaries will only run on the first one)
+xb <- X12(xb)
+#summary with oldOutput
+summary(xb,oldOutput=10)
+#Change the parameter and output of the first series back to the first run
+xb <- prev(xb,index=1,n=1)
+#summary with oldOutput (--- No valid previous runs. ---)
+summary(xb,oldOutput=10)
+}
+
+}
 
 \keyword{methods}
-\keyword{ ~~ other possible keyword(s) ~~ }
+

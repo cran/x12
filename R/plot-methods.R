@@ -155,6 +155,8 @@ setMethod(f='plot',
               lwd_original <- lwd_trend
               lty_original <- lty_trend
             }
+			
+			ts.plot<-ts
 #if(sa && trend &!original){
 #	ts<-ts.sa
 #	col_original <- col_sa
@@ -181,7 +183,9 @@ setMethod(f='plot',
               num.months <- sapply(names.out,function(y) which(unlist(sapply(months,function(x) grepl(x,y,fixed=TRUE)))))
               num.months <- as.numeric(num.months)
               years <- suppressWarnings(as.numeric(sapply(strsplit(names.out,""),function(x)paste(as.vector(na.omit(as.numeric(x)))[1:4],collapse=""))))
-              rest.months <- suppressWarnings(as.numeric(sapply(strsplit(names.out,""),function(x)paste(as.vector(na.omit(as.numeric(x)))[5],collapse=""))))
+              rest.months <- suppressWarnings(as.numeric(sapply(strsplit(names.out,""),function(x){
+										  l.mon<-5:ifelse(length(unlist(x))==8, 5, 6)
+										  paste(as.vector(na.omit(as.numeric(x)))[l.mon],collapse="")})))
               months <- na.omit(c(rbind(num.months,rest.months)))
               out <- cbind(years,months)
               pch.out <- col.out <- names.out2 <- sapply(1:(dim(out)[1]),function(i) unlist(strsplit(names.out[i],as.character(years)[i]))[1])
@@ -200,12 +204,12 @@ setMethod(f='plot',
                 if(!original){
                   cat("Fore-/Backcasts are only available for 'original' (log transformed) time series!\n")	
                   if(is.null(xlim)){
-                    plot(ts,ylim=ylim,xlab=xlab,ylab=ylab,main=main,lwd=lwd_original,col=col_original,lty=lty_original)
+                    plot(ts,ylim=ylim,xlab=xlab,ylab=ylab,main=main,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n")
                   }else{
-                    plot(ts,xlim=xlim,ylim=ylim,xlab=xlab,ylab=ylab,main=main,lwd=lwd_original,col=col_original,lty=lty_original)
+                    plot(ts,xlim=xlim,ylim=ylim,xlab=xlab,ylab=ylab,main=main,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n")
                   }	
                 }else{
-                  plotFbcast(object=object,showCI=showCI,
+                  ts.plot <- plotFbcast(object=object,showCI=showCI,
                       main=main,forecast=forecast,backcast=backcast,log_transform=log_transform,
                       col_original=col_original,col_fc=col_fc,col_bc=col_bc,
                       col_ci=col_ci,col_cishade=col_cishade,points_original=points_original,
@@ -217,9 +221,9 @@ setMethod(f='plot',
                 }
               }else	
               if(is.null(xlim)){
-                plot(ts,ylim=ylim,xlab=xlab,ylab=ylab,main=main,lwd=lwd_original,col=col_original,lty=lty_original)
+                plot(ts,ylim=ylim,xlab=xlab,ylab=ylab,main=main,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n")
               }else{
-                plot(ts,ylim=ylim,xlim=xlim,xlab=xlab,ylab=ylab,main=main,lwd=lwd_original,col=col_original,lty=lty_original)
+                plot(ts,ylim=ylim,xlim=xlim,xlab=xlab,ylab=ylab,main=main,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n")
               }
               if(original && sa)
                 lines(ts.sa,col=col_sa,type="l",lwd=lwd_sa,lty=lty_sa)
@@ -227,11 +231,31 @@ setMethod(f='plot',
                 lines(ts.trend,col=col_trend,type="l",lwd=lwd_trend,lty=lty_trend)
               if(sa && trend &!original)
                 lines(ts.trend,col=col_trend,type="l",lwd=lwd_trend,lty=lty_trend)
-              
+			if((!forecast || !backcast) && points_original)
+				points(ts.plot,col=col_original,lwd=lwd_original)			
+			ts<-ts.plot
+			aT <- aL <- axTicks(1)
+			if(!is.null(xlim))
+				tp <- expand.grid(floor(xlim[1]):ceiling(xlim[2]),(0:(frequency(ts)-1))/frequency(ts))
+			else
+				tp <- expand.grid(floor(time(ts)[1]):ceiling(time(ts)[length(ts)]),(0:(frequency(ts)-1))/frequency(ts))			
+			mm <- round(tp[,2]*frequency(ts))
+			yy <- tp[,1]
+			tp <- tp[,1]+tp[,2]
+			for(i in 1:length(aT)){
+				ii <- which.min(abs(tp-aT[i]))
+				aT[i] <- tp[ii]
+				if(mm[ii]<9)
+					aL[i] <- yy[ii]+(mm[ii]+1)/10
+				else
+					aL[i] <- yy[ii]+(mm[ii]+1)/100
+			}
+			axis(1,at=aT,labels=aL)	
+			
               if(is.null(showOut) &! showAllout){
                 par(mar = c(0, 0, 0, 0)) 
                 if(forecast | backcast){
-                  plotFbcast(object=object,showCI=showCI,
+					ts.plot <- plotFbcast(object=object,showCI=showCI,
                       main=main,forecast=forecast,backcast=backcast,log_transform=log_transform,
                       col_original=NA,col_fc=NA,col_bc=NA,
                       col_ci=NA,col_cishade=NA,
@@ -240,9 +264,9 @@ setMethod(f='plot',
                       ylim=ylim,xlim=xlim,showWarnings=FALSE,type = "n", axes = FALSE, ann = FALSE)	
                 }else{
                   if(is.null(xlim)){
-                    plot(ts,ylim=ylim,type = "n", axes = FALSE, ann = FALSE)
+                    plot(ts,ylim=ylim,type = "n", axes = FALSE, ann = FALSE,xaxt="n")
                   }else{
-                    plot(ts,xlim=xlim,ylim=ylim,type = "n", axes = FALSE, ann = FALSE)
+                    plot(ts,xlim=xlim,ylim=ylim,type = "n", axes = FALSE, ann = FALSE,xaxt="n")
                   }
                 }
                 if(length(leg.txt)>1)
@@ -280,7 +304,7 @@ setMethod(f='plot',
                 }	
                 par(mar = c(0, 0, 0, 0)) 
                 if(forecast | backcast){
-                  plotFbcast(object=object,showCI=showCI,
+					ts.plot <- plotFbcast(object=object,showCI=showCI,
                       main=main,forecast=forecast,backcast=backcast,log_transform=log_transform,
                       col_original=NA,col_fc=NA,col_bc=NA,
                       col_ci=NA,col_cishade=NA,
@@ -289,9 +313,9 @@ setMethod(f='plot',
                       ylim=ylim,xlim=xlim,type = "n", axes = FALSE, ann = FALSE)	
                 }else{
                   if(is.null(xlim)){
-                    plot(ts,ylim=ylim,type = "n", axes = FALSE, ann = FALSE)
+                    plot(ts,ylim=ylim,type = "n", axes = FALSE, ann = FALSE,xaxt="n")
                   }else{
-                    plot(ts,xlim=xlim,ylim=ylim,type = "n", axes = FALSE, ann = FALSE)
+                    plot(ts,xlim=xlim,ylim=ylim,type = "n", axes = FALSE, ann = FALSE,xaxt="n")
                     
                   }
                 }
@@ -358,7 +382,7 @@ setMethod(f='plot',
                 
                 par(mar = c(0, 0, 0, 0)) 
                 if(forecast | backcast){
-                  plotFbcast(object=object,showCI=showCI,
+					ts.plot <- plotFbcast(object=object,showCI=showCI,
                       main=main,forecast=forecast,backcast=backcast,log_transform=log_transform,
                       col_original=NA,col_fc=NA,col_bc=NA,
                       col_ci=NA,col_cishade=NA,
@@ -367,9 +391,9 @@ setMethod(f='plot',
                       ylim=ylim,xlim=xlim,type = "n", axes = FALSE, ann = FALSE)	
                 }else{
                   if(is.null(xlim)){	
-                    plot(ts,ylim=ylim,type = "n", axes = FALSE, ann = FALSE)
+                    plot(ts,ylim=ylim,type = "n", axes = FALSE, ann = FALSE,xaxt="n")
                   }else{
-                    plot(ts,xlim=xlim,ylim=ylim,type = "n", axes = FALSE, ann = FALSE)
+                    plot(ts,xlim=xlim,ylim=ylim,type = "n", axes = FALSE, ann = FALSE,xaxt="n")
                   }
                 }
                 if(original && sa && trend)
@@ -385,12 +409,12 @@ setMethod(f='plot',
                 if(!original){
                   cat("Fore-/Backcasts are only available for 'original' (log transformed) time series!\n")
                   if(is.null(xlim)){
-                    plot(ts,ylim=ylim,xlab=xlab,ylab=ylab,main=main,lwd=lwd_original,col=col_original,lty=lty_original)
+                    plot(ts,ylim=ylim,xlab=xlab,ylab=ylab,main=main,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n")
                   }else{
-                    plot(ts,xlim=xlim,ylim=ylim,xlab=xlab,ylab=ylab,main=main,lwd=lwd_original,col=col_original,lty=lty_original)
+                    plot(ts,xlim=xlim,ylim=ylim,xlab=xlab,ylab=ylab,main=main,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n")
                   }
                 }else{
-                  plotFbcast(object=object,showCI=showCI,
+					ts.plot <- plotFbcast(object=object,showCI=showCI,
                       main=main,forecast=forecast,backcast=backcast,log_transform=log_transform,
                       col_original=col_original,col_fc=col_fc,col_bc=col_bc,
                       col_ci=col_ci,col_cishade=col_cishade,points_original=points_original,
@@ -402,9 +426,9 @@ setMethod(f='plot',
                 }
               }else	
               if(is.null(xlim)){
-                plot(ts,ylim=ylim,xlab=xlab,ylab=ylab,main=main,lwd=lwd_original,col=col_original,lty=lty_original)
+                plot(ts,ylim=ylim,xlab=xlab,ylab=ylab,main=main,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n")
               }else{
-                plot(ts,xlim=xlim,ylim=ylim,xlab=xlab,ylab=ylab,main=main,lwd=lwd_original,col=col_original,lty=lty_original)
+                plot(ts,xlim=xlim,ylim=ylim,xlab=xlab,ylab=ylab,main=main,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n")
               }
               if(original && sa)
                 lines(ts.sa,col=col_sa,type="l",lwd=lwd_sa,lty=lty_sa)
@@ -457,6 +481,28 @@ setMethod(f='plot',
 #				
 #			}
             }
+	if((!forecast || !backcast) && points_original && !plot_legend)
+			points(ts.plot,col=col_original,lwd=lwd_original)
+	ts<-ts.plot
+	aT <- aL <- axTicks(1)
+	if(!is.null(xlim))
+	tp <- expand.grid(floor(xlim[1]):ceiling(xlim[2]),(0:(frequency(ts)-1))/frequency(ts))
+	else
+	tp <- expand.grid(floor(time(ts)[1]):ceiling(time(ts)[length(ts)]),(0:(frequency(ts)-1))/frequency(ts))	
+	mm <- round(tp[,2]*frequency(ts))
+	yy <- tp[,1]
+	tp <- tp[,1]+tp[,2]
+	for(i in 1:length(aT)){
+		ii <- which.min(abs(tp-aT[i]))
+		aT[i] <- tp[ii]
+		if(mm[ii]<9)
+			aL[i] <- yy[ii]+(mm[ii]+1)/10
+		else
+			aL[i] <- yy[ii]+(mm[ii]+1)/100
+	}
+	axis(1,at=aT,labels=aL)	
+
+	
 			gp.new<-par()	
 			invisible(gp.new)
             par(gp)},finally=par(gp))
@@ -755,230 +801,235 @@ setGeneric("plotFbcast",
 
 
 setMethod(
-    f='plotFbcast',
-    signature=signature(object = "x12Output"),definition=function(object,showCI=TRUE,
-        main="Time Series",forecast=TRUE,backcast=TRUE,log_transform=FALSE,
-        col_original="black",col_fc="#2020ff",col_bc="#2020ff",
-        col_ci="#d1d1ff",col_cishade="#d1d1ff",
-        lty_original=1,lty_fc=2,lty_bc=2,lty_ci=1,
-        lwd_original=1,lwd_fc=1,lwd_bc=1,lwd_ci=1,ytop=1,
-        points_bc=FALSE,points_fc=FALSE,points_original=FALSE,
-        showLine=FALSE,col_line="grey",lty_line=3,
-        ylab="Value",xlab="Date",ylim=NULL,xlim=NULL,showWarnings=TRUE,...)
-    {
-      
-      ts <- object@a1	
-      fc <- object@forecast@estimate
-      bc <- object@backcast@estimate
-      lci_fc <- object@forecast@lowerci		
-      uci_fc <- object@forecast@upperci
-      lci_bc <- object@backcast@lowerci
-      uci_bc <- object@backcast@upperci
-      if(log_transform){
-        ts <- log(ts)
-        fc <- log(fc)
-        bc <- log(bc)
-        lci_fc <- log(lci_fc)
-        uci_fc <- log(uci_fc)
-        lci_bc <- log(lci_bc)
-        uci_bc <- log(uci_bc)
-      }
-      
-     
-	  
-      if((!forecast &! backcast) | (forecast && is.na(fc[1]) &! backcast) | (backcast && is.na(bc[1]) &! forecast) | (forecast && is.na(fc[1]) && backcast && is.na(bc[1]))){
-		  if(is.null(ylim))
-			ylim<-c(min(ts,na.rm=TRUE),max(ts,na.rm=TRUE)*ytop)
-            	
-		plot(ts,xlim=xlim,ylim=ylim,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,col=col_original,lty=lty_original,...)
-		if(showLine)
-			abline(v=time(ts)[length(ts)],col=col_line,lty=lty_line)
-		if(points_original)
-			points(ts,col=col_original,lwd=lwd_original)
-		
-        if(showWarnings)
-          cat("No forecasts or backcasts plotted!\n")
-      }				
-      if(forecast && is.na(fc[1]) && showWarnings)		
-        cat("Warning: No forecasts available for plotting.\n")
-      if(backcast && is.na(bc[1]) && showWarnings)
-        cat("Warning: No backcasts available for plotting.\n")
-      
-      if(forecast &! is.na(fc[1]) && (!backcast | is.na(bc[1]))){
-        ts.fc<-ts(c(ts[length(ts)],fc),start=end(ts),end=end(fc),frequency=frequency(ts))
-        if(main=="Time Series")
-          main<-"Time Series with Forecasts"
-        if(showCI){
-          limits.y<-c(min(ts,ts.fc,lci_fc,uci_fc,na.rm=TRUE),max(ts,ts.fc,lci_fc,uci_fc,na.rm=TRUE)*ytop)
-          limits.x<-c(min(time(ts),time(ts.fc),na.rm=TRUE),max(time(ts),time(ts.fc),na.rm=TRUE))
-        }else{
-          limits.y<-c(min(ts,ts.fc,na.rm=TRUE),max(ts,ts.fc,na.rm=TRUE)*ytop)
-          limits.x<-c(min(time(ts),time(ts.fc),na.rm=TRUE),max(time(ts),time(ts.fc),na.rm=TRUE))
-        }
+		f='plotFbcast',
+		signature=signature(object = "x12Output"),definition=function(object,showCI=TRUE,
+				main="Time Series",forecast=TRUE,backcast=TRUE,log_transform=FALSE,
+				col_original="black",col_fc="#2020ff",col_bc="#2020ff",
+				col_ci="#d1d1ff",col_cishade="#d1d1ff",
+				lty_original=1,lty_fc=2,lty_bc=2,lty_ci=1,
+				lwd_original=1,lwd_fc=1,lwd_bc=1,lwd_ci=1,ytop=1,
+				points_bc=FALSE,points_fc=FALSE,points_original=FALSE,
+				showLine=FALSE,col_line="grey",lty_line=3,
+				ylab="Value",xlab="Date",ylim=NULL,xlim=NULL,showWarnings=TRUE,...)
+		{
+			
+			ts.plot <- ts <- object@a1	
+			fc <- object@forecast@estimate
+			bc <- object@backcast@estimate
+			lci_fc <- object@forecast@lowerci		
+			uci_fc <- object@forecast@upperci
+			lci_bc <- object@backcast@lowerci
+			uci_bc <- object@backcast@upperci
+			if(log_transform){
+			ts.plot <- ts <- log(ts)
+				fc <- log(fc)
+				bc <- log(bc)
+				lci_fc <- log(lci_fc)
+				uci_fc <- log(uci_fc)
+				lci_bc <- log(lci_bc)
+				uci_bc <- log(uci_bc)
+			}
+			
+			
+			
+			if((!forecast &! backcast) | (forecast && is.na(fc[1]) &! backcast) | (backcast && is.na(bc[1]) &! forecast) | (forecast && is.na(fc[1]) && backcast && is.na(bc[1]))){
+				if(is.null(ylim))
+					ylim<-c(min(ts,na.rm=TRUE),max(ts,na.rm=TRUE)*ytop)
+				
+				plot(ts,xlim=xlim,ylim=ylim,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n",...)
+				if(showLine)
+					abline(v=time(ts)[length(ts)],col=col_line,lty=lty_line)
+				if(points_original)
+					points(ts,col=col_original,lwd=lwd_original)
+				
+				if(showWarnings)
+					cat("No forecasts or backcasts plotted!\n")
+			}				
+			if(forecast && is.na(fc[1]) && showWarnings)		
+				cat("Warning: No forecasts available for plotting.\n")
+			if(backcast && is.na(bc[1]) && showWarnings)
+				cat("Warning: No backcasts available for plotting.\n")
+			
+			if(forecast &! is.na(fc[1]) && (!backcast | is.na(bc[1]))){
+				ts.fc<-ts(c(ts[length(ts)],fc),start=end(ts),end=end(fc),frequency=frequency(ts))
+				ts.plot<- ts(c(ts,fc),start=start(ts),end=end(fc),frequency=frequency(ts))
+				if(main=="Time Series")
+					main<-"Time Series with Forecasts"
+				if(showCI){
+					limits.y<-c(min(ts,ts.fc,lci_fc,uci_fc,na.rm=TRUE),max(ts,ts.fc,lci_fc,uci_fc,na.rm=TRUE)*ytop)
+					limits.x<-c(min(time(ts),time(ts.fc),na.rm=TRUE),max(time(ts),time(ts.fc),na.rm=TRUE))
+				}else{
+					limits.y<-c(min(ts,ts.fc,na.rm=TRUE),max(ts,ts.fc,na.rm=TRUE)*ytop)
+					limits.x<-c(min(time(ts),time(ts.fc),na.rm=TRUE),max(time(ts),time(ts.fc),na.rm=TRUE))
+				}
 #				leg.txt <- c(leg.txt,"Original TS")
 #				leg.col <- c(leg.col,col_original)
-        if(is.null(ylim)){	
-          if(is.null(xlim)){
-            plot(ts,ylim=limits.y,xlim=limits.x,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,col=col_original,lty=lty_original,...)
-          }else{
-            plot(ts,xlim=xlim,ylim=limits.y,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,col=col_original,lty=lty_original,...)
-          }
-        }else{
-		ylim<-c(min(limits.y[1],ylim[1]),max(limits.y[2],ylim[2]))	
-          if(is.null(xlim)){
-            plot(ts,ylim=ylim,xlim=limits.x,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,col=col_original,lty=lty_original,...)
-          }else{
-            plot(ts,xlim=xlim,ylim=ylim,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,col=col_original,lty=lty_original,...)
-          }
-        }
-        if(showCI){
-          yy <- as.numeric(uci_fc)
-          yy <- yy[length(yy):1]
-          yCI=c(as.numeric(lci_fc),yy)
-          xCI=c(time(lci_fc),time(lci_fc)[length(yy):1])
+				if(is.null(ylim)){	
+					if(is.null(xlim)){
+						plot(ts,ylim=limits.y,xlim=limits.x,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n",...)
+					}else{
+						plot(ts,xlim=xlim,ylim=limits.y,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n",...)
+					}
+				}else{
+					ylim<-c(min(limits.y[1],ylim[1]),max(limits.y[2],ylim[2]))	
+					if(is.null(xlim)){
+						plot(ts,ylim=ylim,xlim=limits.x,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n",...)
+					}else{
+						plot(ts,xlim=xlim,ylim=ylim,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n",...)
+					}
+				}
+				if(showCI){
+					yy <- as.numeric(uci_fc)
+					yy <- yy[length(yy):1]
+					yCI=c(as.numeric(lci_fc),yy)
+					xCI=c(time(lci_fc),time(lci_fc)[length(yy):1])
 #		  yCI=c(yCI[length(yCI)],yCI)#,yCI[1])
 #		  xCI=c(xCI[length(xCI)],xCI)#,xCI[1])  
-          polygon(xCI,yCI,col=col_cishade,border=NA)
-          lines(lci_fc,col=col_ci,lty=lty_ci,lwd=lwd_ci)
-          lines(uci_fc,col=col_ci,lty=lty_ci,lwd=lwd_ci)
-          if(length(lci_fc)==1){
-            lines(x=rep(time(ts.fc)[length(ts.fc)],2),y=c(ts.fc[length(ts.fc)],lci_fc),col=col_ci,lty=lty_ci,lwd=lwd_ci,type="o",pch=c(NA,"_")	)
-            lines(x=rep(time(ts.fc)[length(ts.fc)],2),y=c(ts.fc[length(ts.fc)],uci_fc),col=col_ci,lty=lty_ci,lwd=lwd_ci,type="o",pch=c(NA,"_"))	
-          }
-          
-        }
-        lines(ts.fc,col=col_fc,lty=lty_fc,lwd=lwd_fc)
-        
-        if(showLine)
-          abline(v=time(ts)[length(ts)],col=col_line,lty=lty_line)
-        if(points_fc)
-          points(fc,col=col_fc,lwd=lwd_fc)
-        if(points_original)
-          points(ts,col=col_original,lwd=lwd_original)
-        
-      }
-      if(backcast &! is.na(bc[1]) && (!forecast | is.na(fc[1]))){		
-        ts.bc<-ts(c(bc,ts[1]),start=start(bc),end=start(ts),frequency=frequency(ts))
-        if(main=="Time Series")
-          main<-"Time Series with Backcasts"
+					polygon(xCI,yCI,col=col_cishade,border=NA)
+					lines(lci_fc,col=col_ci,lty=lty_ci,lwd=lwd_ci)
+					lines(uci_fc,col=col_ci,lty=lty_ci,lwd=lwd_ci)
+					if(length(lci_fc)==1){
+						lines(x=rep(time(ts.fc)[length(ts.fc)],2),y=c(ts.fc[length(ts.fc)],lci_fc),col=col_ci,lty=lty_ci,lwd=lwd_ci,type="o",pch=c(NA,"_")	)
+						lines(x=rep(time(ts.fc)[length(ts.fc)],2),y=c(ts.fc[length(ts.fc)],uci_fc),col=col_ci,lty=lty_ci,lwd=lwd_ci,type="o",pch=c(NA,"_"))	
+					}
+					
+				}
+				lines(ts.fc,col=col_fc,lty=lty_fc,lwd=lwd_fc)
+				
+				if(showLine)
+					abline(v=time(ts)[length(ts)],col=col_line,lty=lty_line)
+				if(points_fc)
+					points(fc,col=col_fc,lwd=lwd_fc)
+				if(points_original)
+					points(ts,col=col_original,lwd=lwd_original)
+				
+			}
+			if(backcast &! is.na(bc[1]) && (!forecast | is.na(fc[1]))){		
+				ts.bc<-ts(c(bc,ts[1]),start=start(bc),end=start(ts),frequency=frequency(ts))
+				ts.plot<- ts(c(bc,ts),start=start(bc),end=end(ts),frequency=frequency(ts))
+				
+				if(main=="Time Series")
+					main<-"Time Series with Backcasts"
 #				leg.txt <- c(leg.txt,"Original TS")
 #				leg.col <- c(leg.col,col_original)
-        if(showCI){
-          limits.y<-c(min(ts,ts.bc,lci_bc,na.rm=TRUE),max(ts,ts.bc,uci_bc,na.rm=TRUE)*ytop)
-          limits.x<-c(min(time(ts),time(ts.bc),na.rm=TRUE),max(time(ts),time(ts.bc),na.rm=TRUE))		
-        }else{
-          limits.y<-c(min(ts,ts.bc,na.rm=TRUE),max(ts,ts.bc,na.rm=TRUE)*ytop)
-          limits.x<-c(min(time(ts),time(ts.bc),na.rm=TRUE),max(time(ts),time(ts.bc),na.rm=TRUE))		
-        }
-        if(is.null(ylim)){
-          if(is.null(xlim)){
-            plot(ts,ylim=limits.y,xlim=limits.x,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,col=col_original,lty=lty_original,...)
-          }else{
-            plot(ts,xlim=xlim,ylim=limits.y,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,col=col_original,lty=lty_original,...)
-          }
-        }else{
-			ylim<-c(min(limits.y[1],ylim[1]),max(limits.y[2],ylim[2]))	
-		 if(is.null(xlim)){
-            plot(ts,ylim=ylim,xlim=limits.x,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,col=col_original,lty=lty_original,...)
-          }else{
-            plot(ts,xlim=xlim,ylim=ylim,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,col=col_original,lty=lty_original,...)
-          }
-        }
-        if(showLine)
-          abline(v=time(ts)[1],col=col_line,lty=lty_line)
-        if(showCI){
-          yy <- as.numeric(uci_bc)
-          yy <- yy[length(yy):1]
-          yCI=c(as.numeric(lci_bc),yy)
-          xCI=c(time(lci_bc),time(lci_bc)[length(yy):1])
-          polygon(xCI,yCI,col=col_cishade,border=NA)
-          lines(lci_bc,col=col_ci,lty=lty_ci,lwd=lwd_ci)
-          lines(uci_bc,col=col_ci,lty=lty_ci,lwd=lwd_ci)
-          if(length(lci_bc)==1){
-            lines(x=rep(time(ts.bc)[length(ts.bc)],2),y=c(ts.bc[length(ts.bc)],lci_bc),col=col_ci,lty=lty_ci,lwd=lwd_ci,type="o",pch=c(NA,"_"))
-            lines(x=rep(time(ts.bc)[length(ts.bc)],2),y=c(ts.bc[length(ts.bc)],uci_bc),col=col_ci,lty=lty_ci,lwd=lwd_ci,type="o",pch=c(NA,"_"))	
-          }
-          
-        }
-        lines(ts.bc,col=col_bc,lty=lty_bc,lwd=lwd_bc)
-        if(points_bc)
-          points(bc,col=col_bc,lwd=lwd_bc)
-        if(points_original)
-          points(ts,col=col_original,lwd=lwd_original)
-        
-      }
-      
-      if(forecast &! is.na(fc[1]) && backcast &! is.na(bc[1])){
-        ts.fc<-ts(c(ts[length(ts)],fc),start=end(ts),end=end(fc),frequency=frequency(ts))	
-        ts.bc<-ts(c(bc,ts[1]),start=start(bc),end=start(ts),frequency=frequency(ts))
-        if(main=="Time Series")
-          main<-"Time Series with Back- and Forecasts"
+				if(showCI){
+					limits.y<-c(min(ts,ts.bc,lci_bc,na.rm=TRUE),max(ts,ts.bc,uci_bc,na.rm=TRUE)*ytop)
+					limits.x<-c(min(time(ts),time(ts.bc),na.rm=TRUE),max(time(ts),time(ts.bc),na.rm=TRUE))		
+				}else{
+					limits.y<-c(min(ts,ts.bc,na.rm=TRUE),max(ts,ts.bc,na.rm=TRUE)*ytop)
+					limits.x<-c(min(time(ts),time(ts.bc),na.rm=TRUE),max(time(ts),time(ts.bc),na.rm=TRUE))		
+				}
+				if(is.null(ylim)){
+					if(is.null(xlim)){
+						plot(ts,ylim=limits.y,xlim=limits.x,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n",...)
+					}else{
+						plot(ts,xlim=xlim,ylim=limits.y,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n",...)
+					}
+				}else{
+					ylim<-c(min(limits.y[1],ylim[1]),max(limits.y[2],ylim[2]))	
+					if(is.null(xlim)){
+						plot(ts,ylim=ylim,xlim=limits.x,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n",...)
+					}else{
+						plot(ts,xlim=xlim,ylim=ylim,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n",...)
+					}
+				}
+				if(showLine)
+					abline(v=time(ts)[1],col=col_line,lty=lty_line)
+				if(showCI){
+					yy <- as.numeric(uci_bc)
+					yy <- yy[length(yy):1]
+					yCI=c(as.numeric(lci_bc),yy)
+					xCI=c(time(lci_bc),time(lci_bc)[length(yy):1])
+					polygon(xCI,yCI,col=col_cishade,border=NA)
+					lines(lci_bc,col=col_ci,lty=lty_ci,lwd=lwd_ci)
+					lines(uci_bc,col=col_ci,lty=lty_ci,lwd=lwd_ci)
+					if(length(lci_bc)==1){
+						lines(x=rep(time(ts.bc)[length(ts.bc)],2),y=c(ts.bc[length(ts.bc)],lci_bc),col=col_ci,lty=lty_ci,lwd=lwd_ci,type="o",pch=c(NA,"_"))
+						lines(x=rep(time(ts.bc)[length(ts.bc)],2),y=c(ts.bc[length(ts.bc)],uci_bc),col=col_ci,lty=lty_ci,lwd=lwd_ci,type="o",pch=c(NA,"_"))	
+					}
+					
+				}
+				lines(ts.bc,col=col_bc,lty=lty_bc,lwd=lwd_bc)
+				if(points_bc)
+					points(bc,col=col_bc,lwd=lwd_bc)
+				if(points_original)
+					points(ts,col=col_original,lwd=lwd_original)
+				
+			}
+			
+			if(forecast &! is.na(fc[1]) && backcast &! is.na(bc[1])){
+				ts.fc<-ts(c(ts[length(ts)],fc),start=end(ts),end=end(fc),frequency=frequency(ts))	
+				ts.bc<-ts(c(bc,ts[1]),start=start(bc),end=start(ts),frequency=frequency(ts))
+				ts.plot<- ts(c(bc,ts,fc),start=start(bc),end=end(fc),frequency=frequency(ts))
+				
+				if(main=="Time Series")
+					main<-"Time Series with Back- and Forecasts"
 #				leg.txt <- c(leg.txt,"Original TS")
 #				leg.col <- c(leg.col,col_original)
-        if(showCI){
-          limits.y<-c(min(ts,ts.fc,ts.bc,lci_bc,lci_bc,lci_fc,uci_fc,na.rm=TRUE),max(ts,ts.fc,ts.bc,lci_bc,lci_bc,lci_fc,uci_fc,na.rm=TRUE)*ytop)
-          limits.x<-c(min(time(ts),time(ts.fc),time(ts.bc),na.rm=TRUE),max(time(ts),time(ts.fc),time(ts.bc),na.rm=TRUE))		
-        }else{
-          limits.y<-c(min(ts,ts.fc,ts.bc,na.rm=TRUE),max(ts,ts.fc,ts.bc,na.rm=TRUE)*ytop)
-          limits.x<-c(min(time(ts),time(ts.fc),time(ts.bc),na.rm=TRUE),max(time(ts),time(ts.fc),time(ts.bc),na.rm=TRUE))		
-        }
-        if(is.null(ylim)){
-          if(is.null(xlim)){
-            plot(ts,ylim=limits.y,xlim=limits.x,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,col=col_original,lty=lty_original,...)
-          }else{
-            plot(ts,xlim=xlim,ylim=limits.y,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,col=col_original,lty=lty_original,...)
-          }
-        }else{
-			ylim<-c(min(limits.y[1],ylim[1]),max(limits.y[2],ylim[2]))	
-          if(is.null(xlim)){
-            plot(ts,ylim=ylim,xlim=limits.x,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,col=col_original,lty=lty_original,...)
-          }else{
-            plot(ts,xlim=xlim,ylim=ylim,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,col=col_original,lty=lty_original,...)
-          }
-        }
-        if(showLine){
-          abline(v=time(ts)[length(ts)],col=col_line,lty=lty_line)
-          abline(v=time(ts)[1],col=col_line,lty=lty_line)
-        }
-        if(showCI){
-          yy.fc <- as.numeric(uci_fc)
-          yy.fc <- yy.fc[length(yy.fc):1]
-          yCI.fc=c(as.numeric(lci_fc),yy.fc)
-          xCI.fc=c(time(lci_fc),time(lci_fc)[length(yy.fc):1])
-          polygon(xCI.fc,yCI.fc,col=col_cishade,border=NA)
-          
-          yy.bc <- as.numeric(uci_bc)
-          yy.bc <- yy.bc[length(yy.bc):1]
-          yCI.bc=c(as.numeric(lci_bc),yy.bc)
-          xCI.bc=c(time(lci_bc),time(lci_bc)[length(yy.bc):1])
-          polygon(xCI.bc,yCI.bc,col=col_cishade,border=NA)
-          
-          lines(lci_fc,col=col_ci,lty=lty_ci,lwd=lwd_ci)
-          lines(uci_fc,col=col_ci,lty=lty_ci,lwd=lwd_ci)
-          lines(lci_bc,col=col_ci,lty=lty_ci,lwd=lwd_ci)
-          lines(uci_bc,col=col_ci,lty=lty_ci,lwd=lwd_ci)
-          if(length(lci_bc)==1){
-            lines(x=rep(time(ts.bc)[length(ts.bc)],2),y=c(ts.bc[length(ts.bc)],lci_bc),col=col_ci,lty=lty_ci,lwd=lwd_ci,type="o",pch=c(NA,"_"))
-            lines(x=rep(time(ts.bc)[length(ts.bc)],2),y=c(ts.bc[length(ts.bc)],uci_bc),col=col_ci,lty=lty_ci,lwd=lwd_ci,type="o",pch=c(NA,"_"))	
-          }
-          if(length(lci_fc)==1){
-            lines(x=rep(time(ts.fc)[length(ts.fc)],2),y=c(ts.fc[length(ts.fc)],lci_fc),col=col_ci,lty=lty_ci,lwd=lwd_ci,type="o",pch=c(NA,"_")	)
-            lines(x=rep(time(ts.fc)[length(ts.fc)],2),y=c(ts.fc[length(ts.fc)],uci_fc),col=col_ci,lty=lty_ci,lwd=lwd_ci,type="o",pch=c(NA,"_"))	
-          }	
-        }
-        lines(ts.fc,col=col_fc,lty=lty_fc,lwd=lwd_fc)
-        lines(ts.bc,col=col_bc,lty=lty_bc,lwd=lwd_bc)
-        
-        if(points_fc)
-          points(fc,col=col_fc,lwd=lwd_fc)
-        if(points_bc)
-          points(bc,col=col_bc,lwd=lwd_bc)
-        if(points_original)
-          points(ts,col=col_original,lwd=lwd_original)
-        
-      }
-      
-    }			
+				if(showCI){
+					limits.y<-c(min(ts,ts.fc,ts.bc,lci_bc,lci_bc,lci_fc,uci_fc,na.rm=TRUE),max(ts,ts.fc,ts.bc,lci_bc,lci_bc,lci_fc,uci_fc,na.rm=TRUE)*ytop)
+					limits.x<-c(min(time(ts),time(ts.fc),time(ts.bc),na.rm=TRUE),max(time(ts),time(ts.fc),time(ts.bc),na.rm=TRUE))		
+				}else{
+					limits.y<-c(min(ts,ts.fc,ts.bc,na.rm=TRUE),max(ts,ts.fc,ts.bc,na.rm=TRUE)*ytop)
+					limits.x<-c(min(time(ts),time(ts.fc),time(ts.bc),na.rm=TRUE),max(time(ts),time(ts.fc),time(ts.bc),na.rm=TRUE))		
+				}
+				if(is.null(ylim)){
+					if(is.null(xlim)){
+						plot(ts,ylim=limits.y,xlim=limits.x,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n",...)
+					}else{
+						plot(ts,xlim=xlim,ylim=limits.y,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n",...)
+					}
+				}else{
+					ylim<-c(min(limits.y[1],ylim[1]),max(limits.y[2],ylim[2]))	
+					if(is.null(xlim)){
+						plot(ts,ylim=ylim,xlim=limits.x,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n",...)
+					}else{
+						plot(ts,xlim=xlim,ylim=ylim,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n",...)
+					}
+				}
+				if(showLine){
+					abline(v=time(ts)[length(ts)],col=col_line,lty=lty_line)
+					abline(v=time(ts)[1],col=col_line,lty=lty_line)
+				}
+				if(showCI){
+					yy.fc <- as.numeric(uci_fc)
+					yy.fc <- yy.fc[length(yy.fc):1]
+					yCI.fc=c(as.numeric(lci_fc),yy.fc)
+					xCI.fc=c(time(lci_fc),time(lci_fc)[length(yy.fc):1])
+					polygon(xCI.fc,yCI.fc,col=col_cishade,border=NA)
+					
+					yy.bc <- as.numeric(uci_bc)
+					yy.bc <- yy.bc[length(yy.bc):1]
+					yCI.bc=c(as.numeric(lci_bc),yy.bc)
+					xCI.bc=c(time(lci_bc),time(lci_bc)[length(yy.bc):1])
+					polygon(xCI.bc,yCI.bc,col=col_cishade,border=NA)
+					
+					lines(lci_fc,col=col_ci,lty=lty_ci,lwd=lwd_ci)
+					lines(uci_fc,col=col_ci,lty=lty_ci,lwd=lwd_ci)
+					lines(lci_bc,col=col_ci,lty=lty_ci,lwd=lwd_ci)
+					lines(uci_bc,col=col_ci,lty=lty_ci,lwd=lwd_ci)
+					if(length(lci_bc)==1){
+						lines(x=rep(time(ts.bc)[length(ts.bc)],2),y=c(ts.bc[length(ts.bc)],lci_bc),col=col_ci,lty=lty_ci,lwd=lwd_ci,type="o",pch=c(NA,"_"))
+						lines(x=rep(time(ts.bc)[length(ts.bc)],2),y=c(ts.bc[length(ts.bc)],uci_bc),col=col_ci,lty=lty_ci,lwd=lwd_ci,type="o",pch=c(NA,"_"))	
+					}
+					if(length(lci_fc)==1){
+						lines(x=rep(time(ts.fc)[length(ts.fc)],2),y=c(ts.fc[length(ts.fc)],lci_fc),col=col_ci,lty=lty_ci,lwd=lwd_ci,type="o",pch=c(NA,"_")	)
+						lines(x=rep(time(ts.fc)[length(ts.fc)],2),y=c(ts.fc[length(ts.fc)],uci_fc),col=col_ci,lty=lty_ci,lwd=lwd_ci,type="o",pch=c(NA,"_"))	
+					}	
+				}
+				lines(ts.fc,col=col_fc,lty=lty_fc,lwd=lwd_fc)
+				lines(ts.bc,col=col_bc,lty=lty_bc,lwd=lwd_bc)
+				
+				if(points_fc)
+					points(fc,col=col_fc,lwd=lwd_fc)
+				if(points_bc)
+					points(bc,col=col_bc,lwd=lwd_bc)
+				if(points_original)
+					points(ts,col=col_original,lwd=lwd_original)
+				
+			}
+			invisible(ts.plot) 
+		}			
 )
 
 setMethod(f='plotFbcast',

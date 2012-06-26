@@ -58,9 +58,9 @@ header[length(header)+1] <- paste("period=",period,sep="")
 	  }else
 	    datarow[j] <- ""
     }
-    datarows[i+1] <- paste("    ",paste(datarow,collapse=" "),sep="")
+    datarows[i+1] <- paste("",paste(datarow,collapse=" "),sep="")
   }
-  datarows[length(datarows)+1] <- "      )"
+  datarows[length(datarows)+1] <- ")"
 	if(any(grepl("series",addLines))){
 	if(length(unlist(addLines[which(grepl("series",addLines))]))>1){
 		newLines <- unlist(addLines[which(grepl("series",addLines))])[-1]}
@@ -429,9 +429,9 @@ for(i in new.spec){
 			  }else
 				  datarow[j] <- ""
 		  }
-		  datarows[i+1] <- paste("    ",paste(datarow,collapse=" "),sep="")
+		  datarows[i+1] <- paste("",paste(datarow,collapse=" "),sep="")
 	  }
-	  datarows[length(datarows)+1] <- "      )"
+	  datarows[length(datarows)+1] <- ")"
 	  datarows[length(datarows)+1] <- "}"
 	  addcommands <- vector()
 	  if(!x11regress){#transform ausschalten falls x11 Regression

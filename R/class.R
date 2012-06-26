@@ -1,6 +1,7 @@
 ### Class definitions ###
 ## Types for representations
 setClassUnion("listOrNULL", c("list", "NULL"))
+setClassUnion("tsOrNULL", c("ts", "NULL"))
 setClassUnion("matrixOrNULL", c("matrix", "NULL"))
 setClassUnion("dfOrNULL", c("data.frame", "NULL"))
 setClassUnion("characterOrNULL", c("character", "NULL"))
@@ -175,6 +176,7 @@ setClass(
       e2="ts",
       d8="ts",
       b1="ts",
+      otl="tsOrNULL",
       sp0="spectrum",
       sp1="spectrum",
       sp2="spectrum",

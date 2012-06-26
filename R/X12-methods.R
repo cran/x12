@@ -14,7 +14,7 @@ setMethod(
        for(p in Par){
          pp <- c(pp,(paste(p,"=x12BaseInfo@",p,sep="")))
        }
-      pp <- paste("out <- x12(tso=object,",paste(pp,collapse=","),")",sep="")
+      pp <- paste("out <- x12(tso=object,",paste(pp,collapse=","),",tblnames=\"otl\",Rtblnames=\"regressor\")",sep="")
       eval(parse(text=pp))
       classout <- new("x12Output")
       Par <- slotNames(classout)
@@ -63,7 +63,7 @@ setMethod(
         
         if(!is.null(object@tsName))
           pp <- c(pp, paste("file=\"",object@tsName,"\"",sep=""))
-        pp <- paste("out <- x12(tso=object@ts,",paste(pp,collapse=","),")",sep="")
+        pp <- paste("out <- x12(tso=object@ts,",paste(pp,collapse=","),",tblnames=\"otl\",Rtblnames=\"regressor\")",sep="")
         eval(parse(text=pp))
         classout <- new("x12Output")
         Par <- slotNames(classout)

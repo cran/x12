@@ -138,11 +138,12 @@ plot(s)
 #with (all) outliers
 plot(s,showAllout=TRUE,sa=TRUE,trend=TRUE,log_transform=TRUE,lwd_out=1,pch_ao=4)
 plot(s,showAllout=TRUE,sa=TRUE,trend=TRUE,original=FALSE,showAlloutLines=TRUE,col_tc="purple")#,log_transform=TRUE)#,lwd_out=3)
+plot(s,showAllout=TRUE,span=c(1951,1,1953,12),points_original=TRUE,cex_out=2)
 #with showOut
 plot(s,showOut="AO1960.Jun",sa=FALSE,trend=FALSE,annComp=TRUE,log_transform=TRUE)
 plot(s,showOut="AO1958.Mar",sa=TRUE,trend=TRUE,annComp=TRUE,annCompTrend=FALSE)
 plot(s,showOut="AO1950.Jun",annComp=FALSE,cex_out=3,pch_ao=19,col_ao="orange")
-plot(s,showOut="TC1954.Feb")
+plot(s,showOut="TC1954.Mar",span=c(1954,1,1955,12))
 plot(s,showOut="TC1954.Feb",col_tc="green3")
 
 #w/o legend

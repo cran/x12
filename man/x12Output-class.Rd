@@ -26,6 +26,7 @@ Objects can be created by calls of the form \code{new("x12Output", ...)}.
     \item{\code{e2}:}{Object of class \code{"ts"} - the differenced, transformed, seasonally adjusted data.}
     \item{\code{d8}:}{Object of class \code{"ts"} - the final unmodified SI ratios.}
     \item{\code{b1}:}{Object of class \code{"ts"} - the prior adjusted original series.}
+    \item{\code{otl}:}{Object of class \code{"tsOrNULL"} - the outlier regression series}
     \item{\code{sp0}:}{Object of class \code{"spectrum"} - the spectrum of the original series.}
     \item{\code{sp1}:}{Object of class \code{"spectrum"} - the spectrum of the differenced seasonally adjusted series.}
     \item{\code{sp2}:}{Object of class \code{"spectrum"} - the spectrum of modified irregular series.}
