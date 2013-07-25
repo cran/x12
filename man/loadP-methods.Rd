@@ -46,10 +46,10 @@ Functions \code{loadP} and \code{saveP} load and save parameter settings.
 #Create new batch object with 4 time series and change some parameters
 xb <- new("x12Batch",list(AirPassengers,AirPassengers,AirPassengers,AirPassengers))
 xb <- setP(xb,list(automdl=FALSE))
-xb <- setP(xb,list(arima=c(1,1,0),sarima=c(1,1,0)),1)
-xb <- setP(xb,list(arima=c(0,1,1),sarima=c(0,1,1)),2)
-xb <- setP(xb,list(arima=c(0,1,1),sarima=c(1,1,1)),3)
-xb <- setP(xb,list(arima=c(1,1,1),sarima=c(1,1,1)),4)
+xb <- setP(xb,list(arima.model=c(1,1,0),arima.model=c(1,1,0)),1)
+xb <- setP(xb,list(arima.model=c(0,1,1),arima.smodel=c(0,1,1)),2)
+xb <- setP(xb,list(arima.model=c(0,1,1),arima.smodel=c(1,1,1)),3)
+xb <- setP(xb,list(arima.model=c(1,1,1),arima.smodel=c(1,1,1)),4)
 
 #save all parameters
 saveP(xb,file="xyz.RData")
@@ -60,7 +60,7 @@ xb1 <- loadP(xb1,file="xyz.RData")
 
 
 xs <- new("x12Single",ts=AirPassengers)
-xs <- setP(xs,list(arima=c(2,1,1),sarima=c(2,1,1)))
+xs <- setP(xs,list(arima.model=c(2,1,1),arima.smodel=c(2,1,1)))
 #Save the parameters
 saveP(xs,file="xyz1.RData")
 
@@ -73,6 +73,6 @@ xb <- new("x12Batch",list(AirPassengers,AirPassengers,AirPassengers,AirPassenger
 xb <- loadP(xb,file="xyz1.RData")
 }
 }
-\seealso{\code{\link{X12}}, \code{\link{x12Batch}}}
+\seealso{\code{\link{x12}}, \code{\link{x12Batch}}}
 
 \keyword{methods}

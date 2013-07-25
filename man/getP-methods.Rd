@@ -11,9 +11,9 @@
 \alias{setP,x12Parameter-method}
 \alias{setP,x12Single-method}
 
-\title{ \code{getP} and \code{setP} for setting and loading parameters}
+\title{ \code{getP} and \code{setP} for retrieving and setting parameters}
 \description{
- \code{getP} and \code{setP} for setting and loading parameters from a 
+ \code{getP} and \code{setP} for retrieving and setting parameters from a 
  \code{\link{x12Single-class}}, \code{\link{x12Batch-class}} or \code{\link{x12Parameter-class}} object.
  }
 \section{Methods}{
@@ -46,28 +46,29 @@
 \item{index}{index of the series in \code{\link{x12Batch-class}} to change or extract (NULL=all)}
 }
 
-\seealso{\code{\link{X12}}, \code{\link{x12Batch}}}
+\seealso{\code{\link{x12}}, \code{\link{x12Single}}, \code{\link{x12Batch}}}
 \examples{
 \dontrun{
 #Create new batch object with 4 time series
 xb <- new("x12Batch",list(AirPassengers,AirPassengers,AirPassengers,AirPassengers))
 # change the automdl to FALSE in all 4 elements
 xb <- setP(xb,list(automdl=FALSE))
-#change the arima and sarima setting for the first ts object
-xb <- setP(xb,list(arima=c(1,1,0),sarima=c(1,1,0)),1)
-#change the arima and sarima setting for the second ts object
-xb <- setP(xb,list(arima=c(0,1,1),sarima=c(0,1,1)),2)
-#change the arima and sarima setting for the third ts object
-xb <- setP(xb,list(arima=c(0,1,1),sarima=c(1,1,1)),3)
-#change the arima and sarima setting for the fourth ts object
-xb <- setP(xb,list(arima=c(1,1,1),sarima=c(1,1,1)),4)
-#run X12 on all series
-xb <- X12(xb)
+#change the arima.model and arima.smodel settings for the first ts object
+xb <- setP(xb,list(arima.model=c(1,1,0),arima.smodel=c(1,1,0)),1)
+#change the arima.model and arima.smodel settings for the second ts object
+xb <- setP(xb,list(arima.model=c(0,1,1),arima.smodel=c(0,1,1)),2)
+#change the arima.model and arima.smodel settingsfor the third ts object
+xb <- setP(xb,list(arima.model=c(0,1,1),arima.smodel=c(1,1,1)),3)
+#change the arima.model and arima.smodel settings for the fourth ts object
+xb <- setP(xb,list(arima.model=c(1,1,1),arima.smodel=c(1,1,1)),4)
+#run x12 on all series
+xb <- x12(xb)
 summary(xb)
 #Set automdl=TRUE for the first ts
 xb <- setP(xb,list(automdl=TRUE),1)
-#rerun X12 on all series (the binaries will only run on the first one)
-xb <- X12(xb)
+getP(xb,"automdl")
+#rerun x12 on all series (the binaries will only run on the first one)
+xb <- x12(xb)
 #summary with oldOutput
 summary(xb,oldOutput=10)
 #Change the parameter and output of the first series back to the first run

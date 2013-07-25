@@ -1,4 +1,4 @@
-plot.x12<-function(x,plots=c(1:9),...){
+plot.x12work<-function(x,plots=c(1:9),...){
 #plots 1: Original
 #plots 2: Original Trend Adjusted
 #plots 3: Log Original
@@ -158,7 +158,7 @@ plot_original_seasonal_trend <- function(out,ylab="Value",xlab="Date",
 plot_spectrum <- function(out,which="seasonaladj",xlab="Frequency",ylab="Decibels",
     main="default",
     col_bar="darkgrey",col_seasonal="red",col_td="blue",
-    lwd_bar=4,lwd_seasonal=1,lwd_td=1,plot_legend=TRUE){
+    lwd_bar=4,lwd_seasonal=1,lwd_td=1,plot_legend=TRUE,...){
   if(which=="seasonaladj")
     which <- "sp1"
   else if(which=="original")
@@ -180,13 +180,13 @@ plot_spectrum <- function(out,which="seasonaladj",xlab="Frequency",ylab="Decibel
 plot_spectrum_work(out[[which]]$frequency,out[[which]]$spectrum,xlab=xlab,ylab=ylab,
       main=main,
       col_bar=col_bar,col_seasonal=col_seasonal,col_td=col_td,
-      lwd_bar=lwd_bar,lwd_seasonal=lwd_seasonal,lwd_td=lwd_td,plot_legend=plot_legend)
+      lwd_bar=lwd_bar,lwd_seasonal=lwd_seasonal,lwd_td=lwd_td,plot_legend=plot_legend,...)
 }
   
 plot_spectrum_work <- function(frequency,spectrum,xlab="Frequency",ylab="Decibels",
 		f=12,main="default",highlight=TRUE,
 		col_bar="darkgrey",col_seasonal="red",col_td="blue",
-		lwd_bar=4,lwd_seasonal=1,lwd_td=1,plot_legend=TRUE)
+		lwd_bar=4,lwd_seasonal=1,lwd_td=1,plot_legend=TRUE,...)
 {
 	gp<-par()
 	for(i in c("cin","cra","csi","cxy","din")){
@@ -195,7 +195,7 @@ plot_spectrum_work <- function(frequency,spectrum,xlab="Frequency",ylab="Decibel
 tryCatch({
 	par(mar = c(4, 4, 4, 2) + 0.1) 
 	layout(matrix(c(rep(1,16),2,2),nrow=9,byrow=TRUE))#,heights = c(1, 6), respect = FALSE)
-	plot(frequency,spectrum,type="n",xlab=xlab,ylab=ylab,main=main,col=col_bar)
+	plot(frequency,spectrum,type="n",xlab=xlab,ylab=ylab,main=main,col=col_bar,...)
 	
 	#f <- 12#frequency(out[["a1"]])
 #	abline(v=(1:(f/2))*1/f,col=col_seasonal,lwd=lwd_seasonal)
@@ -231,7 +231,7 @@ if(highlight){
 	
 }	
 	par(mar = c(0, 0, 0, 0)) 
-	plot(frequency,spectrum,type = "n", axes = FALSE, ann = FALSE)
+	plot(frequency,spectrum,type = "n", axes = FALSE, ann = FALSE,...)
 	if(plot_legend){
 		if(f==12)
 			legend("center",legend=c("Spectrum","Seasonal Frequencies","Trading Day Frequencies"),lty=rep(1,3),col=c(col_bar,col_seasonal,col_td),bg="white",horiz=TRUE)

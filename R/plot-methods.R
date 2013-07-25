@@ -1,6 +1,6 @@
 setMethod(f='plot',
     signature=signature(x = "x12Output"),
-    definition=function(x,y=NULL,original=TRUE,sa=FALSE,trend=FALSE,
+    definition=function(x,original=TRUE,sa=FALSE,trend=FALSE,
         log_transform=FALSE,
         ylab="Value",xlab="Date",
         main="TS",
@@ -14,7 +14,7 @@ setMethod(f='plot',
         col_fc="#2020ff",col_bc="#2020ff",col_ci="#d1d1ff",col_cishade="#d1d1ff",
         lty_original=1,lty_fc=2,lty_bc=2,lty_ci=1,lwd_fc=1,lwd_bc=1,lwd_ci=1,
         points_bc=FALSE,points_fc=FALSE,points_original=FALSE,
-        showLine=FALSE,col_line="grey",lty_line=3,ylim=NULL,span=NULL
+        showLine=FALSE,col_line="grey",lty_line=3,ylim=NULL,span=NULL,...
     ) 
     {
       if(is.null(span))
@@ -199,14 +199,14 @@ setMethod(f='plot',
             }				
             if(plot_legend){
               par(mar = c(4, 4, 4, 2) + 0.1) 
-              layout(matrix(c(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2),nrow=9,byrow=TRUE))#,heights = c(1, 6), respect = FALSE)
+              layout(matrix(c(rep(1,16),2,2),nrow=9,byrow=TRUE))#,heights = c(1, 6), respect = FALSE)
               if(forecast | backcast){
                 if(!original){
                   cat("Fore-/Backcasts are only available for 'original' (log transformed) time series!\n")	
                   if(is.null(xlim)){
-                    plot(ts,ylim=ylim,xlab=xlab,ylab=ylab,main=main,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n")
+                    plot(ts,ylim=ylim,xlab=xlab,ylab=ylab,main=main,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n",...)
                   }else{
-                    plot(ts,xlim=xlim,ylim=ylim,xlab=xlab,ylab=ylab,main=main,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n")
+                    plot(ts,xlim=xlim,ylim=ylim,xlab=xlab,ylab=ylab,main=main,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n",...)
                   }	
                 }else{
                   ts.plot <- plotFbcast(object=object,showCI=showCI,
@@ -217,13 +217,13 @@ setMethod(f='plot',
                       lwd_original=lwd_original,lwd_fc=lwd_fc,lwd_bc=lwd_bc,lwd_ci=lwd_ci,
                       ytop=ytop,points_bc=points_bc,points_fc=points_fc,
                       showLine=showLine,col_line=col_line,lty_line=lty_line,
-                      ylab=ylab,xlab=xlab,ylim=ylim,xlim=xlim,showWarnings=showWarnings)	
+                      ylab=ylab,xlab=xlab,ylim=ylim,xlim=xlim,showWarnings=showWarnings,...)	
                 }
               }else	
               if(is.null(xlim)){
-                plot(ts,ylim=ylim,xlab=xlab,ylab=ylab,main=main,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n")
+                plot(ts,ylim=ylim,xlab=xlab,ylab=ylab,main=main,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n",...)
               }else{
-                plot(ts,ylim=ylim,xlim=xlim,xlab=xlab,ylab=ylab,main=main,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n")
+                plot(ts,ylim=ylim,xlim=xlim,xlab=xlab,ylab=ylab,main=main,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n",...)
               }
               if(original && sa)
                 lines(ts.sa,col=col_sa,type="l",lwd=lwd_sa,lty=lty_sa)
@@ -261,12 +261,12 @@ setMethod(f='plot',
                       col_ci=NA,col_cishade=NA,
                       ytop=ytop,
                       col_line=NA,
-                      ylim=ylim,xlim=xlim,showWarnings=FALSE,type = "n", axes = FALSE, ann = FALSE)	
+                      ylim=ylim,xlim=xlim,showWarnings=FALSE,type = "n", axes = FALSE, bty="n", ann = FALSE,...)	
                 }else{
                   if(is.null(xlim)){
-                    plot(ts,ylim=ylim,type = "n", axes = FALSE, ann = FALSE,xaxt="n")
+                    plot(ts,ylim=ylim,type = "n", axes = FALSE, bty="n", ann = FALSE, xaxt="n", ...)
                   }else{
-                    plot(ts,xlim=xlim,ylim=ylim,type = "n", axes = FALSE, ann = FALSE,xaxt="n")
+                    plot(ts,xlim=xlim,ylim=ylim,type = "n", axes = FALSE, bty="n", ann = FALSE, xaxt="n", ...)
                   }
                 }
                 if(length(leg.txt)>1)
@@ -310,12 +310,12 @@ setMethod(f='plot',
                       col_ci=NA,col_cishade=NA,
                       ytop=ytop,
                       col_line=NA,showWarnings=FALSE,
-                      ylim=ylim,xlim=xlim,type = "n", axes = FALSE, ann = FALSE)	
+                      ylim=ylim,xlim=xlim,type = "n", axes = FALSE, bty="n", ann = FALSE,...)	
                 }else{
                   if(is.null(xlim)){
-                    plot(ts,ylim=ylim,type = "n", axes = FALSE, ann = FALSE,xaxt="n")
+                    plot(ts,ylim=ylim,type = "n", axes = FALSE, bty="n", ann = FALSE,xaxt="n",...)
                   }else{
-                    plot(ts,xlim=xlim,ylim=ylim,type = "n", axes = FALSE, ann = FALSE,xaxt="n")
+                    plot(ts,xlim=xlim,ylim=ylim,type = "n", axes = FALSE, bty="n", ann = FALSE,xaxt="n",...)
                     
                   }
                 }
@@ -388,12 +388,12 @@ setMethod(f='plot',
                       col_ci=NA,col_cishade=NA,
                       ytop=ytop,
                       col_line=NA,showWarnings=FALSE,
-                      ylim=ylim,xlim=xlim,type = "n", axes = FALSE, ann = FALSE)	
+                      ylim=ylim,xlim=xlim,type = "n", axes = FALSE, bty="n", ann = FALSE,...)	
                 }else{
                   if(is.null(xlim)){	
-                    plot(ts,ylim=ylim,type = "n", axes = FALSE, ann = FALSE,xaxt="n")
+                    plot(ts,ylim=ylim,type = "n", axes = FALSE, bty="n", ann = FALSE,xaxt="n",...)
                   }else{
-                    plot(ts,xlim=xlim,ylim=ylim,type = "n", axes = FALSE, ann = FALSE,xaxt="n")
+                    plot(ts,xlim=xlim,ylim=ylim,type = "n", axes = FALSE, bty="n", ann = FALSE,xaxt="n",...)
                   }
                 }
                 if(original && sa && trend)
@@ -409,9 +409,9 @@ setMethod(f='plot',
                 if(!original){
                   cat("Fore-/Backcasts are only available for 'original' (log transformed) time series!\n")
                   if(is.null(xlim)){
-                    plot(ts,ylim=ylim,xlab=xlab,ylab=ylab,main=main,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n")
+                    plot(ts,ylim=ylim,xlab=xlab,ylab=ylab,main=main,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n",...)
                   }else{
-                    plot(ts,xlim=xlim,ylim=ylim,xlab=xlab,ylab=ylab,main=main,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n")
+                    plot(ts,xlim=xlim,ylim=ylim,xlab=xlab,ylab=ylab,main=main,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n",...)
                   }
                 }else{
 					ts.plot <- plotFbcast(object=object,showCI=showCI,
@@ -422,13 +422,13 @@ setMethod(f='plot',
                       lwd_original=lwd_original,lwd_fc=lwd_fc,lwd_bc=lwd_bc,lwd_ci=lwd_ci,
                       ytop=ytop,points_bc=points_bc,points_fc=points_fc,
                       showLine=showLine,col_line=col_line,lty_line=lty_line,
-                      ylab=ylab,xlab=xlab,ylim=ylim,xlim=xlim)	
+                      ylab=ylab,xlab=xlab,ylim=ylim,xlim=xlim,...)	
                 }
               }else	
               if(is.null(xlim)){
-                plot(ts,ylim=ylim,xlab=xlab,ylab=ylab,main=main,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n")
+                plot(ts,ylim=ylim,xlab=xlab,ylab=ylab,main=main,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n",...)
               }else{
-                plot(ts,xlim=xlim,ylim=ylim,xlab=xlab,ylab=ylab,main=main,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n")
+                plot(ts,xlim=xlim,ylim=ylim,xlab=xlab,ylab=ylab,main=main,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n",...)
               }
               if(original && sa)
                 lines(ts.sa,col=col_sa,type="l",lwd=lwd_sa,lty=lty_sa)
@@ -480,8 +480,28 @@ setMethod(f='plot',
 #					lines(ts.trend,col=col_trend,type="l",lwd=lwd_trend)
 #				
 #			}
-            }
-	if((!forecast || !backcast) && points_original && !plot_legend)
+ts<-ts.plot
+aT <- aL <- axTicks(1)
+if(!is.null(xlim))
+	tp <- expand.grid(floor(xlim[1]):ceiling(xlim[2]),(0:(frequency(ts)-1))/frequency(ts))
+else
+	tp <- expand.grid(floor(time(ts)[1]):ceiling(time(ts)[length(ts)]),(0:(frequency(ts)-1))/frequency(ts))	
+mm <- round(tp[,2]*frequency(ts))
+yy <- tp[,1]
+tp <- tp[,1]+tp[,2]
+for(i in 1:length(aT)){
+	ii <- which.min(abs(tp-aT[i]))
+	aT[i] <- tp[ii]
+	if(mm[ii]<9)
+		aL[i] <- yy[ii]+(mm[ii]+1)/10
+	else
+		aL[i] <- yy[ii]+(mm[ii]+1)/100
+}
+axis(1,at=aT,labels=aL)	
+
+
+		}
+	if((!forecast || !backcast) && points_original && !plot_legend){
 			points(ts.plot,col=col_original,lwd=lwd_original)
 	ts<-ts.plot
 	aT <- aL <- axTicks(1)
@@ -501,7 +521,7 @@ setMethod(f='plot',
 			aL[i] <- yy[ii]+(mm[ii]+1)/100
 	}
 	axis(1,at=aT,labels=aL)	
-
+	}
 	
 			gp.new<-par()	
 			invisible(gp.new)
@@ -511,7 +531,7 @@ setMethod(f='plot',
 
 setMethod(f='plot',
     signature=signature(x = "x12Single"),
-    definition=function(x,y=NULL,original=TRUE,sa=FALSE,trend=FALSE,
+    definition=function(x,original=TRUE,sa=FALSE,trend=FALSE,
         log_transform=FALSE,
         ylab="Value",xlab="Date",
         main="TS",
@@ -525,8 +545,8 @@ setMethod(f='plot',
         col_fc="#2020ff",col_bc="#2020ff",col_ci="#d1d1ff",col_cishade="#d1d1ff",
         lty_original=1,lty_fc=2,lty_bc=2,lty_ci=1,lwd_fc=1,lwd_bc=1,lwd_ci=1,
         points_bc=FALSE,points_fc=FALSE,points_original=FALSE,
-        showLine=FALSE,col_line="grey",lty_line=3,ylim=NULL,span=NULL){
-      plot(x@x12Output,y=NULL,original=original,sa=sa,trend=trend,
+        showLine=FALSE,col_line="grey",lty_line=3,ylim=NULL,span=NULL,...){
+      plot(x@x12Output,original=original,sa=sa,trend=trend,
           log_transform=log_transform,
           ylab=ylab,xlab=xlab,
           main=main,
@@ -540,7 +560,7 @@ setMethod(f='plot',
           col_fc=col_fc,col_bc=col_bc,col_ci=col_ci,col_cishade=col_cishade,
           lty_original=lty_original,lty_fc=lty_fc,lty_bc=lty_bc,lty_ci=lty_ci,lwd_fc=lwd_fc,lwd_bc=lwd_bc,lwd_ci=lwd_ci,
           points_bc=points_bc,points_fc=points_fc,points_original=points_original,
-          showLine=showLine,col_line=col_line,lty_line=lty_line,ylim=ylim,span=span)      
+          showLine=showLine,col_line=col_line,lty_line=lty_line,ylim=ylim,span=span,...)      
     }
 )
 
@@ -568,6 +588,7 @@ setMethod(
         else if(which=="rsd.pacf"){main <- "Partial Autocorrelations of the Residuals"}        
         else if(which=="rsd.acf2"){main <- "Autocorrelations of the Squared Residuals"}
       }
+	  if(!is.null(x[[which]])){
       if(ylim=="default"){
         ylim<-c(-max(abs(x[[which]][[grep("sample",names(x[[which]]),value=TRUE)]]),2*x[[which]][[grep("stderr",names(x[[which]]),value=TRUE)]]),max(abs(x[[which]][[grep("sample",names(x[[which]]),value=TRUE)]]),2*x[[which]][[grep("stderr",names(x[[which]]),value=TRUE)]]))
       }
@@ -578,8 +599,13 @@ setMethod(
       abline(h=0,col="black")
       lines(x[[which]]$lag,2*x[[which]][[grep("stderr",names(x[[which]]),value=TRUE)]],type="l",col=col_ci,lty=lt_ci)
       lines(x[[which]]$lag,-2*x[[which]][[grep("stderr",names(x[[which]]),value=TRUE)]],type="l",col=col_ci,lty=lt_ci)
-      
-    }
+     }
+	 else{
+	 plot(1:10, type = "n", xaxt="n", yaxt="n", xlab="", ylab="", main=main)	 
+	 text(5.5,5.5,"Not Available")
+ 	 }
+		 
+ }
 )
 
 setMethod(f='plotRsdAcf',
@@ -640,7 +666,7 @@ setMethod(
       tryCatch({
             if(plot_legend){
               par(mar = c(4, 4, 4, 2) + 0.1) 
-              layout(matrix(c(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2),nrow=9,byrow=TRUE))
+              layout(matrix(c(rep(1,16),2,2),nrow=9,byrow=TRUE))
               cex_siratio<-cex_siratio*1.5
               cex_replaced <-cex_replaced*1.5
             }
@@ -678,9 +704,9 @@ setMethod(
             if(plot_legend){
               par(mar = c(0, 0, 0, 0)) 
               if(!"ylim"%in%names(list(...)))
-                plot(1,xlim=xlim,ylim=ylim,type = "n", axes = FALSE, ann = FALSE)				
+                plot(1,xlim=xlim,ylim=ylim,type = "n", axes = FALSE, bty="n", ann = FALSE, ...)				
               else
-                plot(1,xlim=xlim,type = "n", axes = FALSE, ann = FALSE)
+                plot(1,xlim=xlim,type = "n", axes = FALSE, bty="n", ann = FALSE, ...)
               if(SI_Ratios){
                 if(SI_Ratios_replaced)
                   legend("center",legend=c("Seasonal Factors","Mean","SI Ratio","Replaced SI Ratio"),col=c(col_seasonal,col_mean,col_siratio,col_replaced),pch=c(NA,NA,20,20),lty=c(1,1,NA,NA),bg="white",ncol=2,pt.cex=1.4)
@@ -717,7 +743,7 @@ setMethod(
         xlab="Frequency",ylab="Decibels",
         main="Spectrum",highlight=TRUE,
         col_bar="darkgrey",col_seasonal="red",col_td="blue",
-        lwd_bar=4,lwd_seasonal=1,lwd_td=1,plot_legend=TRUE)
+        lwd_bar=4,lwd_seasonal=1,lwd_td=1,plot_legend=TRUE,...)
     {
       if(main=="Spectrum"){
         if(which=="sa")
@@ -747,7 +773,7 @@ setMethod(
       plot_spectrum_work(x@frequency,x@spectrum,xlab=xlab,ylab=ylab,f=f,
           main=main,highlight=highlight,
           col_bar=col_bar,col_seasonal=col_seasonal,col_td=col_td,
-          lwd_bar=lwd_bar,lwd_seasonal=lwd_seasonal,lwd_td=lwd_td,plot_legend=plot_legend)
+          lwd_bar=lwd_bar,lwd_seasonal=lwd_seasonal,lwd_td=lwd_td,plot_legend=plot_legend,...)
       
     })
 
@@ -757,12 +783,12 @@ setMethod(f='plotSpec',
         xlab="Frequency",ylab="Decibels",
         main="Spectrum",highlight=TRUE,
         col_bar="darkgrey",col_seasonal="red",col_td="blue",
-        lwd_bar=4,lwd_seasonal=1,lwd_td=1,plot_legend=TRUE){
+        lwd_bar=4,lwd_seasonal=1,lwd_td=1,plot_legend=TRUE,...){
       plotSpec(x@x12Output,which=which,
           xlab=xlab,ylab=ylab,
           main=main,highlight=highlight,
           col_bar=col_bar,col_seasonal=col_seasonal,col_td=col_td,
-          lwd_bar=lwd_bar,lwd_seasonal=lwd_seasonal,lwd_td=lwd_td,plot_legend=plot_legend)      
+          lwd_bar=lwd_bar,lwd_seasonal=lwd_seasonal,lwd_td=lwd_td,plot_legend=plot_legend,...)      
     }
 )
 
@@ -772,7 +798,7 @@ setMethod(
         xlab="Frequency",ylab="Decibels",
         main="Spectrum",highlight=TRUE,
         col_bar="darkgrey",col_seasonal="red",col_td="blue",
-        lwd_bar=4,lwd_seasonal=1,lwd_td=1,plot_legend=TRUE)
+        lwd_bar=4,lwd_seasonal=1,lwd_td=1,plot_legend=TRUE,...)
     {
 #			myfun <- function(x) deparse(substitute(x)) 
 #		which=NULL
@@ -792,7 +818,7 @@ setMethod(
       plot_spectrum_work(x@frequency,x@spectrum,xlab=xlab,ylab=ylab,f=f,
           main=main,highlight=highlight,
           col_bar=col_bar,col_seasonal=col_seasonal,col_td=col_td,
-          lwd_bar=lwd_bar,lwd_seasonal=lwd_seasonal,lwd_td=lwd_td,plot_legend=plot_legend)
+          lwd_bar=lwd_bar,lwd_seasonal=lwd_seasonal,lwd_td=lwd_td,plot_legend=plot_legend,...)
       
     })
 
@@ -871,7 +897,7 @@ setMethod(
 						plot(ts,xlim=xlim,ylim=limits.y,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n",...)
 					}
 				}else{
-					ylim<-c(min(limits.y[1],ylim[1]),max(limits.y[2],ylim[2]))	
+					#ylim<-c(min(limits.y[1],ylim[1]),max(limits.y[2],ylim[2]))	
 					if(is.null(xlim)){
 						plot(ts,ylim=ylim,xlim=limits.x,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n",...)
 					}else{
@@ -926,7 +952,7 @@ setMethod(
 						plot(ts,xlim=xlim,ylim=limits.y,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n",...)
 					}
 				}else{
-					ylim<-c(min(limits.y[1],ylim[1]),max(limits.y[2],ylim[2]))	
+					#ylim<-c(min(limits.y[1],ylim[1]),max(limits.y[2],ylim[2]))	
 					if(is.null(xlim)){
 						plot(ts,ylim=ylim,xlim=limits.x,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n",...)
 					}else{
@@ -980,7 +1006,7 @@ setMethod(
 						plot(ts,xlim=xlim,ylim=limits.y,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n",...)
 					}
 				}else{
-					ylim<-c(min(limits.y[1],ylim[1]),max(limits.y[2],ylim[2]))	
+					#ylim<-c(min(limits.y[1],ylim[1]),max(limits.y[2],ylim[2]))	
 					if(is.null(xlim)){
 						plot(ts,ylim=ylim,xlim=limits.x,main=main,xlab=xlab,ylab=ylab,lwd=lwd_original,col=col_original,lty=lty_original,xaxt="n",...)
 					}else{

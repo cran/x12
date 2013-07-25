@@ -39,7 +39,7 @@ Alexander Kowarik
 
 
 \seealso{
-\code{\link{X12}},
+\code{\link{x12}},
 \code{\linkS4class{x12Single}},
 \code{\linkS4class{x12Batch}},
 \code{\linkS4class{x12Parameter}},
@@ -47,6 +47,6 @@ Alexander Kowarik
 \code{\linkS4class{x12Output}},
 \code{\linkS4class{x12BaseInfo}},
 %\code{\link{summary}},
-\code{\link{summary.x12}},
-\code{\link{x12}}
+\code{\link{summary.x12work}},
+\code{\link{x12work}}
 }

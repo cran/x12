@@ -22,11 +22,13 @@ Seasonal factor plots with function \code{plotSeasFac} in package \pkg{x12}.
 
 \usage{
 \S4method{plotSeasFac}{x12Output}(x,SI_Ratios=TRUE, ylab="Value", xlab="",
-				lwd_seasonal=1, col_seasonal="black", lwd_mean=1, col_mean="blue", col_siratio="darkgreen",
-				col_replaced="red", cex_siratio=.9, cex_replaced=.9, SI_Ratios_replaced=TRUE, plot_legend=TRUE, ...)
-\S4method{plotSeasFac}{x12Single}(x,SI_Ratios=TRUE, ylab="Value", xlab="",
-				lwd_seasonal=1, col_seasonal="black", lwd_mean=1, col_mean="blue", col_siratio="darkgreen",
-				col_replaced="red", cex_siratio=.9, cex_replaced=.9, SI_Ratios_replaced=TRUE, plot_legend=TRUE, ...)
+  lwd_seasonal=1, col_seasonal="black", lwd_mean=1, col_mean="blue",
+  col_siratio="darkgreen",col_replaced="red", cex_siratio=.9, cex_replaced=.9,
+  SI_Ratios_replaced=TRUE, plot_legend=TRUE, ...)
+\S4method{plotSeasFac}{x12Single}(x,SI_Ratios=TRUE, ylab="Value", xlab="",lwd_seasonal=1,
+  col_seasonal="black", lwd_mean=1, col_mean="blue", col_siratio="darkgreen",
+  col_replaced="red", cex_siratio=.9, cex_replaced=.9, SI_Ratios_replaced=TRUE,
+  plot_legend=TRUE, ...)
 
 				
 }
@@ -53,7 +55,7 @@ Seasonal factor plots with function \code{plotSeasFac} in package \pkg{x12}.
 \author{Alexander Kowarik, Angelika Meraner}
 
 \seealso{
-\code{\link{X12}},
+\code{\link{x12}},
 \code{\link{plot}},
 \code{\link{plotSpec}},
 \code{\link{plotRsdAcf}}
@@ -63,14 +65,16 @@ Seasonal factor plots with function \code{plotSeasFac} in package \pkg{x12}.
 
 \dontrun{
 s <- new("x12Single",ts=AirPassengers,tsName="air")
-s <- setP(s,list(estimate=TRUE,regvariables="AO1950.1",outlier="all",critical=list(LS=3.5,TC=2.5),backcast_years=1/2))
-s <- X12(s)
+s <- setP(s,list(estimate=TRUE,regression.variables="AO1950.1",outlier.types="all",
+  outlier.critical=list(LS=3.5,TC=2.5),backcast_years=1/2))
+s <- x12(s)
 #w/o outliers
 plot(s@x12Output,sa=TRUE,trend=TRUE,original=FALSE)
 plot(s)
 #with (all) outliers
 plot(s,showAllout=TRUE,sa=TRUE,trend=TRUE,log_transform=TRUE,lwd_out=1,pch_ao=4)
-plot(s,showAllout=TRUE,sa=TRUE,trend=TRUE,original=FALSE,showAlloutLines=TRUE,col_tc="purple")#,log_transform=TRUE)#,lwd_out=3)
+plot(s,showAllout=TRUE,sa=TRUE,trend=TRUE,original=FALSE,showAlloutLines=TRUE,
+  col_tc="purple")#,log_transform=TRUE)#,lwd_out=3)
 #with showOut
 plot(s,showOut="AO1960.Jun",sa=FALSE,trend=FALSE,annComp=TRUE,log_transform=TRUE)
 plot(s,showOut="AO1958.Mar",sa=TRUE,trend=TRUE,annComp=TRUE,annCompTrend=FALSE)
@@ -89,7 +93,8 @@ plot(s,showOut="AO1950.1",col_tc="orange",col_ao="magenta",plot_legend=FALSE)
 plot(s,forecast=TRUE)
 plot(s,backcast=TRUE,showLine=TRUE)
 plot(s,backcast=TRUE,forecast=TRUE,showCI=FALSE)
-plot(s,forecast=TRUE,points_fc=TRUE,col_fc="purple",lty_fc=2,lty_original=3,lwd_fc=0.9,lwd_ci=2)
+plot(s,forecast=TRUE,points_fc=TRUE,col_fc="purple",lty_fc=2,lty_original=3,
+  lwd_fc=0.9,lwd_ci=2)
 plot(s,sa=TRUE,plot_legend=FALSE)
 
 #Seasonal Factors and SI Ratios

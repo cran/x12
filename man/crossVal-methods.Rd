@@ -36,20 +36,20 @@ Cross Validation with function \code{crossVal} in package \pkg{x12}.
 		showCI=FALSE, main="Cross Validation",
 		col_original="black", col_fc="#2020ff", col_bc="#2020ff",
 		col_ci="#d1d1ff", col_cishade="#d1d1ff",
-		lty_original=1, lty_fc=1, lty_bc=1, lty_ci=1,
+		lty_original=1, lty_fc=2, lty_bc=2, lty_ci=1,
 		lwd_original=1, lwd_fc=1, lwd_bc=1, lwd_ci=1, ytop=1,
 		points_bc=FALSE, points_fc=FALSE, points_original=FALSE,
 		showLine=TRUE, col_line="grey", lty_line=3,
-		ylab="Value", xlab="Date")
+		ylab="Value", xlab="Date",ylim=NULL,span=NULL)
 \S4method{crossVal}{x12Single}(object, x12BaseInfo=new("x12BaseInfo"),
 		showCI=FALSE, main="Cross Validation",
 		col_original="black", col_fc="#2020ff", col_bc="#2020ff",
 		col_ci="#d1d1ff", col_cishade="#d1d1ff",
-		lty_original=1, lty_fc=1, lty_bc=1, lty_ci=1,
+		lty_original=1, lty_fc=2, lty_bc=2, lty_ci=1,
 		lwd_original=1, lwd_fc=1, lwd_bc=1, lwd_ci=1, ytop=1,
 		points_bc=FALSE, points_fc=FALSE, points_original=FALSE,
 		showLine=TRUE, col_line="grey", lty_line=3,
-		ylab="Value", xlab="Date")
+		ylab="Value", xlab="Date",ylim=NULL,span=NULL)
 }
 
 \arguments{
@@ -79,7 +79,10 @@ Cross Validation with function \code{crossVal} in package \pkg{x12}.
 \item{col_line}{color of \code{showLine}.}
 \item{lty_line}{line type of \code{showLine}.}
 \item{ylab}{label of y-axis.} 
-\item{xlab}{label of x-axis.} 
+\item{xlab}{label of x-axis.}
+\item{ylim}{range of the y-axis}
+ \item{span}{vector of length 4, limiting the data used for the plot.\cr
+  Start and end date of said time interval can be specified by 4 integers in the format \code{c(start year, start seasonal period, end year, end seasonal period)}}
 %\item{...}{ xx }
 }
 
@@ -92,7 +95,7 @@ Cross Validation with function \code{crossVal} in package \pkg{x12}.
 \author{Alexander Kowarik, Angelika Meraner}
 
 \seealso{
-\code{\link{X12}},
+\code{\link{x12}},
 \code{\link{plot}},
 \code{\link{plotSpec}},
 \code{\link{plotSeasFac}},
@@ -102,7 +105,8 @@ Cross Validation with function \code{crossVal} in package \pkg{x12}.
 \examples{
 \dontrun{
 s <- new("x12Single",ts=AirPassengers,tsName="air")
-s <- setP(s,list(estimate=TRUE,regvariables="AO1950.1",outlier="all",critical=list(LS=3.5,TC=2.5),
+s <- setP(s,list(estimate=TRUE,regression.variables="AO1950.1",outlier.types="all",
+  outlier.critical=list(LS=3.5,TC=2.5),
 backcast_years=1/2,forecast_years=1))
 
 cv<-crossVal(s,showLine=TRUE)

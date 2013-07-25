@@ -1,16 +1,16 @@
-read.spc <- function(file,filename=TRUE){
+readSpc <- function(file,filename=TRUE){
   if(length(file)==1)
-    return(read.spcS(file))
+    return(readSpcS(file))
   else{
     tsl <- list()
     for(i in 1:length(file)){
-      tsl[[i]] <- read.spcS(file[i])
+      tsl[[i]] <- readSpcS(file[i])
     }
    return(new("x12Batch",tsList=tsl))
   }
   
 }
-read.spcS <- function(file,filename=TRUE){
+readSpcS <- function(file,filename=TRUE){
   whichgrep <- function(x,txt){
     which(unlist(lapply(x,function(y)length(grep(txt,y,ignore.case=TRUE))>0)))
   }

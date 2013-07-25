@@ -22,14 +22,16 @@ Objects can be created by calls of the form \code{new("x12Batch", tsList, tsName
 }
 \section{Methods}{
   \describe{
-    \item{cleanHistory}{\code{signature(object = "x12Batch")}: ... }
+    \item{\code{\link{setP}}}{\code{signature(object = "x12Batch")}: ... }
+    \item{\code{\link{getP}}}{\code{signature(object = "x12Batch")}: ... }
+    \item{\code{\link{prev}}}{\code{signature(object = "x12Batch")}: ... }
+    \item{\code{\link{cleanHistory}}}{\code{signature(object = "x12Batch")}: ... }
+    \item{\code{\link{loadP}}}{\code{signature(object = "x12Batch")}: ... }
+    \item{\code{\link{saveP}}}{\code{signature(object = "x12Batch")}: ... }
+    \item{\code{\link{summary}}}{\code{signature(object = "x12Batch")}: ... }
+    \item{\code{\link{x12}}}{\code{signature(object = "x12Batch")}: ... }
     \item{dim}{\code{signature(x = "x12Batch")}: ... }
-    \item{getP}{\code{signature(object = "x12Batch")}: ... }
     \item{length}{\code{signature(x = "x12Batch")}: ... }
-    \item{prev}{\code{signature(object = "x12Batch")}: ... }
-    \item{setP}{\code{signature(object = "x12Batch")}: ... }
-    \item{summary}{\code{signature(object = "x12Batch")}: ... }
-    \item{X12}{\code{signature(object = "x12Batch")}: ... }
 	 }
 }
 \author{
@@ -38,18 +40,20 @@ Alexander Kowarik
 
 
 \seealso{
-\code{\link{X12}},
+\code{\link{x12}},
 \code{\linkS4class{x12Single}},
 %\code{\linkS4class{x12Batch}},
 \code{\linkS4class{x12Parameter}},
 \code{\linkS4class{x12List}},
 \code{\linkS4class{x12Output}},
 \code{\linkS4class{x12BaseInfo}},
-%\code{\link{summary}},
-\code{\link{summary.x12}},
-\code{\link{x12}}
+\code{\link{summary}},
+\code{\link{getP}},
+%\code{\link{summary.x12work}},
+\code{\link{x12work}}
 }
 \examples{
+\dontrun{
 #object containing 4 time series and the corresponding parameters and output
 data(AirPassengersX12Batch)
 summary(AirPassengersX12Batch)
@@ -60,33 +64,43 @@ AirPassengersX12Batch <- prev(AirPassengersX12Batch,index=1,n=1)
 #summary with oldOutput (--- No valid previous runs. ---)
 summary(AirPassengersX12Batch,oldOutput=10)
 
-
-\dontrun{
 #Create new batch object with 4 time series
-xb <- new("x12Batch",list(AirPassengers,AirPassengers,AirPassengers,AirPassengers))
-# change the automdl to FALSE in all 4 elements
-xb <- setP(xb,list(automdl=FALSE))
-#change the arima and sarima setting for the first ts object
-xb <- setP(xb,list(arima=c(1,1,0),sarima=c(1,1,0)),1)
-#change the arima and sarima setting for the second ts object
-xb <- setP(xb,list(arima=c(0,1,1),sarima=c(0,1,1)),2)
-#change the arima and sarima setting for the third ts object
-xb <- setP(xb,list(arima=c(0,1,1),sarima=c(1,1,1)),3)
-#change the arima and sarima setting for the fourth ts object
-xb <- setP(xb,list(arima=c(1,1,1),sarima=c(1,1,1)),4)
-#run X12 on all series
-xb <- X12(xb)
+xb <- new("x12Batch",list(AirPassengers,ldeaths,nottem,UKgas),
+  c("Air","ldeaths","nottem","UKgas"))
+# change outlier.types to "all" in all 4 elements
+xb <- setP(xb,list(outlier.types="all"))
+#change the arima.model and arima.smodel setting for the first ts object
+xb <- setP(xb,list(arima.model=c(0,1,1),arima.smodel=c(0,1,1)),1)
+#change the arima.model and arima.smodel setting for the second ts object
+xb <- setP(xb,list(arima.model=c(0,1,1),arima.smodel=c(0,1,1)),2)
+#change the arima.model and arima.smodel setting for the third ts object
+xb <- setP(xb,list(arima.model=c(0,1,1),arima.smodel=c(0,1,1)),3)
+#change the arima.model and arima.smodel setting for the fourth ts object
+xb <- setP(xb,list(arima.model=c(0,1,1),arima.smodel=c(0,1,1)),4)
+#run x12 on all series
+xb <- x12(xb)
 summary(xb)
 #Set automdl=TRUE for the first ts
 xb <- setP(xb,list(automdl=TRUE),1)
-#rerun X12 on all series (the binaries will only run on the first one)
-xb <- X12(xb)
+#rerun x12 on all series (the binaries will only run on the first one)
+xb <- x12(xb)
 #summary with oldOutput
 summary(xb,oldOutput=10)
 #Change the parameter and output of the first series back to the first run
 xb <- prev(xb,index=1,n=1)
 #summary with oldOutput (--- No valid previous runs. ---)
 summary(xb,oldOutput=10)
+
+#Create new batch object by combining objects of class x12Single
+s1 <- new("x12Single",ts=AirPassengers,tsName="air")
+s1 <- setP(s1,list(estimate=TRUE,regression.variables="AO1950.1",outlier.types="all",
+  outlier.critical=list(LS=3.5,TC=2.5)))
+s2 <- new("x12Single",ts=UKgas,tsName="UKgas")
+s2 <- setP(s2,list(slidingspans=TRUE,history=TRUE,
+  history.estimates=c("sadj","sadjchng","trend","trendchng","seasonal","aic"),
+  history.sadjlags=c(1,2),automdl=TRUE))
+b <- new("x12Batch",list(s1,s2))
+b <- x12(b)
 }
 }
 \keyword{classes}

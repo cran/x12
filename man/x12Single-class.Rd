@@ -6,7 +6,7 @@
 
 \title{Class \code{"x12Single"}}
 \description{
-Class consisting of all information for \code{\link{X12}}.
+Class consisting of all information for \code{\link{x12}}.
 }
 \section{Objects from the Class}{
 Objects can be created by calls of the form \code{new("x12Single", ...)}.
@@ -25,12 +25,14 @@ Objects can be created by calls of the form \code{new("x12Single", ...)}.
 }
 \section{Methods}{
   \describe{
-    \item{\code{\link{cleanHistory}}}{\code{signature(object = "x12Single")}}
+   	\item{\code{\link{setP}}}{\code{signature(object = "x12Single")}}
     \item{\code{\link{getP}}}{\code{signature(object = "x12Single")}}
     \item{\code{\link{prev}}}{\code{signature(object = "x12Single")}}
-    \item{\code{\link{setP}}}{\code{signature(object = "x12Single")}}
+    \item{\code{\link{cleanHistory}}}{\code{signature(object = "x12Single")}}
+    \item{\code{\link{loadP}}}{\code{signature(object = "x12Single")}}
+    \item{\code{\link{saveP}}}{\code{signature(object = "x12Single")}}
     \item{\code{\link{summary}}}{\code{signature(object = "x12Single")}}
-    \item{\code{\link{X12}}}{\code{signature(object = "x12Single")}}
+    \item{\code{\link{x12}}}{\code{signature(object = "x12Single")}}
     \item{\code{\link{plot}}}{\code{signature(object = "x12Single")}}
 	\item{\code{\link{crossVal}}}{\code{signature(object = "x12Single")}}
 	\item{\code{\link{plotSpec}}}{\code{signature(object = "x12Single")}}
@@ -43,22 +45,24 @@ Objects can be created by calls of the form \code{new("x12Single", ...)}.
 Alexander Kowarik}
 
 \seealso{
-\code{\link{X12}},
+\code{\link{x12}},
 %\code{\linkS4class{x12Single}},
 \code{\linkS4class{x12Batch}},
 \code{\linkS4class{x12Parameter}},
 \code{\linkS4class{x12List}},
 \code{\linkS4class{x12Output}},
 \code{\linkS4class{x12BaseInfo}},
-%\code{\link{summary}},
-\code{\link{summary.x12}},
-\code{\link{x12}}
+\code{\link{summary}},
+\code{\link{getP}},
+%\code{\link{summary.x12work}},
+\code{\link{x12work}}
 }
 \examples{
 \dontrun{
 s <- new("x12Single",ts=AirPassengers,tsName="air")
-s <- setP(s,list(estimate=TRUE,regvariables="AO1950.1",outlier="all",critical=list(LS=3.5,TC=2.5)))
-s <- X12(s)
+s <- setP(s,list(estimate=TRUE,regression.variables="AO1950.1",outlier.types="all",
+  outlier.critical=list(LS=3.5,TC=2.5)))
+s <- x12(s)
 }
 }
 \keyword{classes}

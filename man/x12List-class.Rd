@@ -29,7 +29,7 @@ Alexander Kowarik
 }
 
 \seealso{
-\code{\link{X12}},
+\code{\link{x12}},
 \code{\linkS4class{x12Single}},
 \code{\linkS4class{x12Batch}},
 \code{\linkS4class{x12Parameter}},

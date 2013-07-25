@@ -6,7 +6,7 @@
 
 \title{Class \code{"x12BaseInfo"}}
 \description{
-Baseinfo for use with the \code{\link{X12}} function and classes.
+Baseinfo for use with the \code{\link{x12}} function and classes.
 }
 \section{Objects from the Class}{
 Objects can be created by calls of the form \code{new("x12BaseInfo", x12path, x13path, use, showWarnings)}.
@@ -29,7 +29,7 @@ Alexander Kowarik
 
 
 \seealso{
-\code{\link{X12}},
+\code{\link{x12}},
 \code{\linkS4class{x12Single}},
 \code{\linkS4class{x12Batch}},
 \code{\linkS4class{x12Parameter}},

@@ -1,13 +1,13 @@
-\name{X12}
+\name{x12}
 \docType{methods}
-\alias{X12}
-\alias{X12-methods}
-\alias{X12,ts-method}
-\alias{X12,x12Batch-method}
-\alias{X12,x12Single-method}
-\title{ ~~ Methods for Function \code{X12} in Package \pkg{x12} ~~}
+\alias{x12}
+\alias{x12-methods}
+\alias{x12,ts-method}
+\alias{x12,x12Batch-method}
+\alias{x12,x12Single-method}
+\title{ ~~ Methods for Function \code{x12} in Package \pkg{x12} ~~}
 \description{
- ~~ Methods for function \code{X12} in package \pkg{x12} ~~
+ ~~ Methods for function \code{x12} in package \pkg{x12} ~~
 }
 \section{Methods}{
 \describe{
@@ -23,7 +23,7 @@
 }}
 
 \usage{
-X12(object,x12Parameter=new("x12Parameter"),x12BaseInfo=new("x12BaseInfo"),...)
+x12(object,x12Parameter=new("x12Parameter"),x12BaseInfo=new("x12BaseInfo"),...)
 }
 
 \arguments{
@@ -51,17 +51,25 @@ Alexander Kowarik, Angelika Meraner}
 
 \seealso{
 \code{\link{summary}},
-\code{\link{plot}}
+\code{\link{plot}},
+\code{\link{x12env}},
+\code{\link{setP}},
+\code{\link{getP}},
+\code{\link{loadP}},
+\code{\link{saveP}},
+\code{\link{prev}},
+\code{\link{cleanHistory}},
+\code{\link{crossVal}}
 }
 
 \examples{
 \dontrun{
-x12path <- ".../x12a.exe"
-xts <- X12(AirPassengers)
+x12path("../x12a.exe")
+xts <- x12(AirPassengers)
 summary(xts)
-xs <- X12(new("x12Single",ts=AirPassengers))
+xs <- x12(new("x12Single",ts=AirPassengers))
 summary(xs)
-xb<-X12(new("x12Batch",list(AirPassengers,AirPassengers,AirPassengers)))
+xb<-x12(new("x12Batch",list(AirPassengers,AirPassengers,AirPassengers)))
 summary(xb)
 
 #Create new batch object with 4 time series
@@ -69,23 +77,23 @@ xb <- new("x12Batch",list(AirPassengers,AirPassengers,AirPassengers,AirPassenger
 
 # change the automdl to FALSE in all 4 elements
 xb <- setP(xb,list(automdl=FALSE))
-#change the arima and sarima setting for the first ts object
-xb <- setP(xb,list(arima=c(1,1,0),sarima=c(1,1,0)),1)
-#change the arima and sarima setting for the second ts object
-xb <- setP(xb,list(arima=c(0,1,1),sarima=c(0,1,1)),2)
-#change the arima and sarima setting for the third ts object
-xb <- setP(xb,list(arima=c(0,1,1),sarima=c(1,1,1)),3)
-#change the arima and sarima setting for the fourth ts object
-xb <- setP(xb,list(arima=c(1,1,1),sarima=c(1,1,1)),4)
-#run X12 on all series
-xb <- X12(xb)
+#change the arima.model and arima.smodel setting for the first ts object
+xb <- setP(xb,list(arima.model=c(1,1,0),arima.smodel=c(1,1,0)),1)
+#change the arima.model and arima.smodel setting for the second ts object
+xb <- setP(xb,list(arima.model=c(0,1,1),arima.smodel=c(0,1,1)),2)
+#change the arima.model and arima.smodel setting for the third ts object
+xb <- setP(xb,list(arima.model=c(0,1,1),arima.smodel=c(1,1,1)),3)
+#change the arima.model and arima.smodel setting for the fourth ts object
+xb <- setP(xb,list(arima.model=c(1,1,1),arima.smodel=c(1,1,1)),4)
+#run x12 on all series
+xb <- x12(xb)
 summary(xb)
 
 #Set automdl=TRUE for the first ts
 xb <- setP(xb,list(automdl=TRUE),1)
 
-#rerun X12 on all series (the binaries will only run on the first one)
-xb <- X12(xb)
+#rerun x12 on all series (the binaries will only run on the first one)
+xb <- x12(xb)
 
 #summary with oldOutput
 summary(xb,oldOutput=10)

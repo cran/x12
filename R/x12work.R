@@ -1,403 +1,86 @@
-x12 <- function(tso,period=frequency(tso),span=NULL,modelspan=NULL,
-				decimals=2,transform="auto",
-		        arima=NULL,sarima=NULL,
-				automdl=FALSE,acceptdefault=FALSE,balanced=TRUE,maxorder=c(3,2),maxdiff=c(1,1),
-				regvariables=NULL,reguser=NULL,regfile=NULL,usertype=NULL,centeruser=NULL,regfilestart=NULL,#regfileformat=NULL,
-                tblnames=NULL,Rtblnames=NULL,addLines=NULL,
-                x12path=NULL,x13path=NULL,use="x12",
-				seats=FALSE, seatsparameter=NULL,
-                sigmalim=c(1.5,2.5),outlier=NULL,critical=NULL,outlier_span=NULL,outlier_method=NULL,
-				file="Rout",forecast_years=NULL,backcast_years=NULL,forecast_conf=.95,estimate=FALSE,
-				estOutofsample=TRUE,slidingspans=FALSE,aictest=NULL,
-				onlytd=FALSE,sfshort=FALSE,samode=NULL,seasonalma=NULL,trendma=NULL,
-				x11appendfcst=TRUE,x11appendbcst=FALSE,x11calendarsigma=NULL,x11excludefcst=TRUE,x11final="user",
-				x11regress=FALSE,keep_x12out=FALSE,showWarnings=FALSE
+# Underlying S3 function
+x12work <- function(tso,period=frequency(tso),file="Rout",
+		series.span=NULL,series.modelspan=NULL,
+		transform.function="auto",transform.power=NULL,transform.adjust=NULL,
+		regression.variables=NULL,regression.user=NULL,regression.file=NULL,
+		regression.usertype=NULL,regression.centeruser=NULL,regression.start=NULL,
+		regression.aictest=NULL,
+		outlier.types=NULL,outlier.critical=NULL,outlier.span=NULL,outlier.method=NULL,
+		identify=FALSE,identify.diff=NULL,identify.sdiff=NULL,identify.maxlag=NULL,
+		arima.model=NULL,arima.smodel=NULL,arima.ar=NULL,arima.ma=NULL,
+		automdl=FALSE,automdl.acceptdefault=FALSE,automdl.balanced=TRUE,
+		automdl.maxorder=c(3,2),automdl.maxdiff=c(1,1),
+		forecast_years=NULL,backcast_years=NULL,forecast_conf=.95,
+		estimate=FALSE,estimate.outofsample=TRUE,
+		check=TRUE,check.maxlag=NULL,
+		slidingspans=FALSE,
+		slidingspans.fixmdl=NULL,slidingspans.fixreg=NULL,
+		slidingspans.length=NULL,slidingspans.numspans=NULL,
+		slidingspans.outlier=NULL,
+		slidingspans.additivesa=NULL,slidingspans.start=NULL,
+		history=FALSE,
+		history.estimates=NULL,history.fixmdl=FALSE,
+		history.fixreg=NULL,history.outlier=NULL,
+		history.sadjlags=NULL,history.trendlags=NULL,history.start=NULL,history.target=NULL,
+		x11.sigmalim=c(1.5,2.5),x11.type=NULL,x11.sfshort=FALSE,x11.samode=NULL,
+		x11.seasonalma=NULL,x11.trendma=NULL,
+		x11.appendfcst=TRUE,x11.appendbcst=FALSE,x11.calendarsigma=NULL,
+		x11.excludefcst=TRUE,x11.final="user",
+		x11regression=FALSE,
+		tblnames=NULL,Rtblnames=NULL,
+		x12path=NULL,x13path=NULL,use="x12",
+		keep_x12out=FALSE,showWarnings=TRUE
 ){
-#addLines=list(list("series","bla=blabla"),list("regression","bla2=soundso","bla4=diesunddas"))
+
+	### Quick Fix: Rename the parameters to previous version:
+	seats=FALSE 
+	seatsparameter=NULL
+	span <-	series.span
+	modelspan <-series.modelspan
+	transform<-transform.function	
+	regvariables <- regression.variables
+	reguser <- regression.user
+	regfile <- regression.file
+	usertype <- regression.usertype
+	centeruser <- regression.centeruser
+	regfilestart <- regression.start
+	aictest<-regression.aictest
+#	outlier.detection <- outlier
+	outlier <- outlier.types
+	critical <- outlier.critical
+	outlier_span <- outlier.span
+	outlier_method <- outlier.method	
+	arima <- arima.model
+	sarima <- arima.smodel
+	acceptdefault <- automdl.acceptdefault
+	balanced <- automdl.balanced
+	maxorder <- automdl.maxorder
+	maxdiff	<- automdl.maxdiff
+	estOutofsample <- estimate.outofsample
+	sigmalim <- x11.sigmalim
+	onlytd <- x11.type 
+	sfshort <- x11.sfshort
+	samode <- x11.samode
+	seasonalma <- x11.seasonalma
+	trendma <- x11.trendma
+	x11appendfcst <- x11.appendfcst
+	x11appendbcst <- x11.appendbcst
+	x11calendarsigma <- x11.calendarsigma
+	x11excludefcst <- x11.excludefcst
+	x11final <- x11.final
+	x11regress <- x11regression
+	
+	
 file.remove(grep(basename(file),list.files(dirname(file)),value=TRUE))
 unlink(paste(dirname(file),"/gra",sep=""),recursive=TRUE)
 if((length(tso)/period)>15 && !is.null(backcast_years) && !showWarnings){
 cat("\nWarning: x12 cannot produce backcasts for time series that are more than 15 years long!\n")
 }
-#if(forecast_years==0 && !estimate){
-#cat("\nWarning: No proper run of x12! Check your parameter settings.\n")	
-#}
-if(!is.null(addLines)){ #start option addLines
-	header <- vector()
-  header[length(header)+1] <- "series {"
-  header[length(header)+1] <- 'title="R Output for X12a"'
-  header[length(header)+1] <- paste("decimals=",decimals,sep="")
-  header[length(header)+1] <- paste("start=",paste(start(tso),collapse="."),sep="")
-if(!is.null(span)){
-topaste<-span
-tocollapse<-c(".",".")
-	if(any(is.na(span))){
-	topaste[which(is.na(span))]<-""
-	tocollapse[which(is.na(span))[2]/2]<-""
-	}
-	header[length(header)+1] <- paste("span=(",paste(topaste[1:2],collapse=tocollapse[1]),",",paste(topaste[3:4],collapse=tocollapse[2]),")",sep="")
-}
-if(!is.null(modelspan)){
-topaste<-modelspan
-tocollapse<-c(".",".")
-			if(any(is.na(modelspan))){
-				topaste[which(is.na(modelspan))]<-""
-				tocollapse[which(is.na(modelspan))[2]/2]<-""
-			}
-	header[length(header)+1] <- paste("modelspan=(",paste(topaste[1:2],collapse=tocollapse[1]),",",paste(topaste[3:4],collapse=tocollapse[2]),")",sep="")
-}
-header[length(header)+1] <- paste("period=",period,sep="")
-  header[length(header)+1] <- "data=("
-  datarows<-vector()
-  tsov<-as.vector(tso)
-   for(i in 0:(length(tso)/period)){
-    datarow<-vector()
-    for(j in 1:period){
-      if(!is.na(tsov[period*i+j])){
-        datarow[j] <- tsov[period*i+j]
-	  }else
-	    datarow[j] <- ""
-    }
-    datarows[i+1] <- paste("",paste(datarow,collapse=" "),sep="")
-  }
-  datarows[length(datarows)+1] <- ")"
-	if(any(grepl("series",addLines))){
-	if(length(unlist(addLines[which(grepl("series",addLines))]))>1){
-		newLines <- unlist(addLines[which(grepl("series",addLines))])[-1]}
-	else{
-		newLines <- unlist(addLines)[-1]}	
-	addhead<-length(datarows)
-	for(j in 1:length(newLines)){
-		addhead <- addhead+1
-	datarows[addhead] <- newLines[j]	
-	}
-}  
-datarows[length(datarows)+1] <- "}"
-  addcommands <- vector()
-	if(!x11regress){#transform ausschalten falls x11 Regression
-  	addcommands[length(addcommands)+1] <- paste("transform {") 
-	addcommands[length(addcommands)+1] <- paste("function=",transform,sep="") 
-	if(any(grepl("transform",addLines))){
-		if(length(unlist(addLines[which(grepl("transform",addLines))]))>1){
-			newLines <- unlist(addLines[which(grepl("transform",addLines))])[-1]}
-		else{
-			newLines <- unlist(addLines)[-1]}	
-		length.addcom<- length(addcommands)
-		for(j in 1:length(newLines)){
-			length.addcom <- length.addcom+1
-			addcommands[length.addcom] <- newLines[j]	
-		}}  
-	addcommands[length(addcommands)+1] <- "}"
-	}
-  if(!is.null(arima)&&!x11regress){
-	arima <- paste("(",paste(arima,collapse=","),")",sep="")
-	if(!is.null(sarima))
-	sarima <- paste("(",paste(sarima,collapse=","),")",sep="")
-    addcommands[length(addcommands)+1] <- paste("arima {")
-	addcommands[length(addcommands)+1] <- paste("model=",arima,sarima,sep="")
-	if(any(grepl("arima",addLines))){
-		if(length(unlist(addLines[which(grepl("arima",addLines))]))>1){
-			newLines <- unlist(addLines[which(grepl("arima",addLines))])[-1]}
-		else{
-			newLines <- unlist(addLines)[-1]}	
-		length.addcom<- length(addcommands)
-		for(j in 1:length(newLines)){
-			length.addcom <- length.addcom+1
-			addcommands[length.addcom] <- newLines[j]	
-		}}  
-	addcommands[length(addcommands)+1] <- "}"
-  }
-  if(!is.null(arima)&&automdl&&!x11regress)
-	  cat("Warning: 'automdl' is ignored because an ARIMA model has been specified! \n")
-  
-    #cat("Arima and Sarima model specifications are ignored, because automdl is activated! \n")
-  if(any(c(!is.null(regvariables),!is.null(reguser),!is.null(regfile))) &&! x11regress){
-    addcommands[length(addcommands)+1] <- "regression {"
-    if(!is.null(regvariables))
-      addcommands[length(addcommands)+1] <- paste("variables=(",paste(regvariables,collapse=" "),")",sep="")
-    if(!is.null(aictest))
-      addcommands[length(addcommands)+1] <- paste("aictest=(",aictest,") savelog= aictest",sep="")
-    if(!is.null(reguser))
-      addcommands[length(addcommands)+1] <- paste("user=(",paste(reguser,collapse=" "),")",sep="")
-    if(!is.null(regfile))
-      addcommands[length(addcommands)+1] <- paste("file='",regfile,"'",sep="")
-  if(!is.null(regfilestart))
-	  addcommands[length(addcommands)+1] <- paste("start=",paste(regfilestart,collapse="."),"",sep="")
-  	if(!is.null(usertype))
-	  addcommands[length(addcommands)+1] <- paste("usertype=(",paste(usertype,collapse=" "),")",sep="")
-  	if(!is.null(centeruser))
-	  addcommands[length(addcommands)+1] <- paste("centeruser=",centeruser,sep="")
-  if(any(grepl("regression",addLines))){
-	  if(length(unlist(addLines[which(grepl("regression",addLines))]))>1){
-		  newLines <- unlist(addLines[which(grepl("regression",addLines))])[-1]}
-	  else{
-		  newLines <- unlist(addLines)[-1]}	
-	  length.addcom<- length(addcommands)
-	  	  for(j in 1:length(newLines)){
-		  length.addcom <- length.addcom+1
-		  addcommands[length.addcom] <- newLines[j]	
-		}}  
-  	  addcommands[length(addcommands)+1] <- "}"
-  }
-  if(!is.null(outlier) &&! x11regress){
-    addcommands[length(addcommands)+1] <- "outlier {"
-    if(all(outlier=="all"))
-	  addcommands[length(addcommands)+1] <- "types=(all)"
-    else
-	  addcommands[length(addcommands)+1] <- paste("types=(",paste(outlier,collapse=" "),")",sep="")
-    if(!is.null(critical)){
-		if(is.list(critical)){
-		critval <- vector()
-		ifelse(is.null(critical$AO),critval[1] <- "",critval[1] <- critical$AO)
-		ifelse(is.null(critical$LS),critval[2] <- "",critval[2] <- critical$LS)
-		ifelse(is.null(critical$TC),critval[3] <- "",critval[3] <- critical$TC)
-		addcommands[length(addcommands)+1] <- paste("critical=(",paste(critval,collapse=","),")",sep="")
-	}else{addcommands[length(addcommands)+1] <- paste("critical=(",paste(critical,collapse=","),")",sep="")	
-	}
-	}
-  	if(!is.null(outlier_span))
-      addcommands[length(addcommands)+1] <- paste("span=(",paste(outlier_span,collapse=","),")",sep="")	
-	addcommands[length(addcommands)+1] <- "print=(default)"
-	if(!is.null(outlier_method) &&! x11regress){
-		addcommands[length(addcommands)+1] <- paste("method=",paste(outlier_method,collapse=","),sep="")	
-	}
-	if(any(grepl("outlier",addLines))){
-		if(length(unlist(addLines[which(grepl("outlier",addLines))]))>1){
-			newLines <- unlist(addLines[which(grepl("outlier",addLines))])[-1]}
-		else{
-			newLines <- unlist(addLines)[-1]}	
-		length.addcom<- length(addcommands)
-		for(j in 1:length(newLines)){
-			length.addcom <- length.addcom+1
-			addcommands[length.addcom] <- newLines[j]	
-		}}  	
-	addcommands[length(addcommands)+1] <- "}"
-  }
-	if(!x11regress){#nicht bei x11 Regression
-  if(estimate){
-    addcommands[length(addcommands)+1] <- "estimate {"
-#	if(!is.null(estExact)){
-#		addcommands[length(addcommands)+1] <- paste("exact=",estExact,sep="")	
-##		addcommands[length(addcommands)+1] <- paste("save=(rts)")	
-#	}
-	if(estOutofsample){	
-	addcommands[length(addcommands)+1] <- "outofsample=yes"}
-	if(any(grepl("estimate",addLines))){
-		if(length(unlist(addLines[which(grepl("estimate",addLines))]))>1){
-			newLines <- unlist(addLines[which(grepl("estimate",addLines))])[-1]}
-		else{
-			newLines <- unlist(addLines)[-1]}	
-		length.addcom<- length(addcommands)
-	for(j in 1:length(newLines)){
-		length.addcom <- length.addcom+1
-		addcommands[length.addcom] <- newLines[j]	
-	}}  	
-    addcommands[length(addcommands)+1] <- "print=(default + rts)"
-    addcommands[length(addcommands)+1] <- "savelog=(aic bic afc)"
-	addcommands[length(addcommands)+1] <- "}"
-    addcommands[length(addcommands)+1] <- "check {"
-    addcommands[length(addcommands)+1] <- "print=(default+specresidual+pacfplot)"
-    addcommands[length(addcommands)+1] <- "savelog=(nrm lbq)"
-	if(any(grepl("check",addLines))){
-		if(length(unlist(addLines[which(grepl("check",addLines))]))>1){
-			newLines <- unlist(addLines[which(grepl("check",addLines))])[-1]}
-		else{
-			newLines <- unlist(addLines)[-1]}	
-		length.addcom<- length(addcommands)
-		for(j in 1:length(newLines)){
-			length.addcom <- length.addcom+1
-			addcommands[length.addcom] <- newLines[j]	
-		}}  	
-	addcommands[length(addcommands)+1] <- "}"
-  }
-  if(slidingspans){
-    addcommands[length(addcommands)+1] <- "slidingspans {" 
-    addcommands[length(addcommands)+1] <- "savelog=percent"
-    addcommands[length(addcommands)+1] <- "additivesa=percent"
-	if(any(grepl("slidingspans",addLines))){
-		if(length(unlist(addLines[which(grepl("slidingspans",addLines))]))>1){
-			newLines <- unlist(addLines[which(grepl("slidingspans",addLines))])[-1]}
-		else{
-			newLines <- unlist(addLines)[-1]}	
-		length.addcom<- length(addcommands)
-		for(j in 1:length(newLines)){
-			length.addcom <- length.addcom+1
-			addcommands[length.addcom] <- newLines[j]	
-		}}  	
-    addcommands[length(addcommands)+1] <- "}" 
-  }
-    if(automdl && is.null(arima) && is.null(sarima)){
-  addcommands[length(addcommands)+1] <- "automdl {"
-  if(acceptdefault)
-    addcommands[length(addcommands)+1] <- "acceptdefault=yes"
-  else
-    addcommands[length(addcommands)+1] <- "acceptdefault=no"
-  if(balanced)
-    addcommands[length(addcommands)+1] <- "balanced=yes"
-  else
-    addcommands[length(addcommands)+1] <- "balanced=no"
+	
 
-  addcommands[length(addcommands)+1] <- paste("maxorder=(",paste(maxorder,collapse=","),")",sep="")
-  addcommands[length(addcommands)+1] <- paste("maxdiff=(",paste(maxdiff,collapse=","),")",sep="")
-  addcommands[length(addcommands)+1] <- "balanced=yes"
-  if(any(grepl("automdl",addLines))){
-	  if(length(unlist(addLines[which(grepl("automdl",addLines))]))>1){
-		  newLines <- unlist(addLines[which(grepl("automdl",addLines))])[-1]}
-	  else{
-		  newLines <- unlist(addLines)[-1]}	
-	  length.addcom<- length(addcommands)
-	  for(j in 1:length(newLines)){
-		  length.addcom <- length.addcom+1
-		  addcommands[length.addcom] <- newLines[j]	
-	  }}  	
-  addcommands[length(addcommands)+1] <- "savelog=(adf amd b5m mu)"
-  addcommands[length(addcommands)+1] <- "}" }
-#Forecasts Backcasts
-  addcommands[length(addcommands)+1] <- "forecast {"
-  addcommands[length(addcommands)+1] <- paste("PROBABILITY=",forecast_conf,sep="")
-	if(!is.null(forecast_years)){
-		addcommands[length(addcommands)+1] <- paste("maxlead=",forecast_years*frequency(tso),sep="")
-	}
-	if(!is.null(backcast_years)){
-		addcommands[length(addcommands)+1] <- paste("maxback=",backcast_years*frequency(tso),sep="")
-#	save(bct)
-	}
-	if(any(grepl("forecast",addLines))){
-		if(length(unlist(addLines[which(grepl("forecast",addLines))]))>1){
-			newLines <- unlist(addLines[which(grepl("forecast",addLines))])[-1]}
-		else{
-			newLines <- unlist(addLines)[-1]}	
-		length.addcom<- length(addcommands)
-		for(j in 1:length(newLines)){
-			length.addcom <- length.addcom+1
-			addcommands[length.addcom] <- newLines[j]	
-		}}  	
-	addcommands[length(addcommands)+1] <- "}"
-  
-  }#end nicht bei x11 Regression
-  if(!seats){
-	  addcommands[length(addcommands)+1] <- "x11 {"
-	  if(onlytd)
-		  addcommands[length(addcommands)+1] <- "type= trend"
-	  if(sfshort)  
-		  addcommands[length(addcommands)+1] <- "sfshort=yes"
-	  if(!is.null(sigmalim)){
-		  sigmalim <- paste("(",sigmalim[1],",",sigmalim[2],")",sep="")
-		  addcommands[length(addcommands)+1] <- paste("sigmalim=",sigmalim,sep="")
-	  }
-	  if(!is.null(samode))
-	addcommands[length(addcommands)+1] <- paste("mode=",samode,sep="")	
-	if(!is.null(seasonalma)){
-	addcommands[length(addcommands)+1] <- paste("seasonalma=(",paste(seasonalma,collapse=" "),")",sep="")}	
-	if(!is.null(trendma)){
-	addcommands[length(addcommands)+1] <- paste("trendma=",trendma,sep="")		
-	}
-	#x11appendbcst=TRUE,x11appendbcst=FALSE,x11calendarsigma=NULL,x11excludefcst=TRUE,x11final="user",
-	if(!is.null(x11calendarsigma))
-	addcommands[length(addcommands)+1] <- paste("calendarsigma=",x11calendarsigma,sep="")
-	if(x11excludefcst)
-	addcommands[length(addcommands)+1] <- "excludefcst=yes"
-	if(x11appendbcst)
-	addcommands[length(addcommands)+1] <- "appendbcst=yes" ###backcast
-	if(x11final!="none")
-	addcommands[length(addcommands)+1] <- paste("final=(",paste(x11final,collapse=" "),")",sep="")
-	if(x11appendfcst)
-	addcommands[length(addcommands)+1] <- "appendfcst=yes" ###forecast
-	if(any(grepl("x11",addLines))){
-		if(length(unlist(addLines[which(grepl("x11",addLines))]))>1){
-		newLines <- unlist(addLines[which(grepl("x11",addLines))])[-1]}
-		else{
-		newLines <- unlist(addLines)[-1]}
-		length.addcom<- length(addcommands)
-		for(j in 1:length(newLines)){
-			length.addcom <- length.addcom+1
-			addcommands[length.addcom] <- newLines[j]	
-		}}  	
-    addcommands[length(addcommands)+1] <- "savelog=all"
-    addcommands[length(addcommands)+1] <- "}" 
-  }else{
-    addcommands[length(addcommands)+1] <- paste("seats {")
-	addcommands[length(addcommands)+1] <- paste(seatsparameter)	
-	if(any(grepl("seats",addLines))){
-		if(length(unlist(addLines[which(grepl("seats",addLines))]))>1){
-			newLines <- unlist(addLines[which(grepl("seats",addLines))])[-1]}
-		else{
-			newLines <- unlist(addLines)[-1]}	
-		length.addcom<- length(addcommands)
-		for(j in 1:length(newLines)){
-			length.addcom <- length.addcom+1
-			addcommands[length.addcom] <- newLines[j]	
-		}}  		
-	addcommands[length(addcommands)+1] <- "}"
-	}
-  if(x11regress){
-#start: The start date for the values of the user-defined regression variables.
-# The default is the start date of the series. 
-# Valid values are any date up to the start date of the series 
-# (or up to the start date of the span specified by the span argument of the series spec, if present).
-	  addcommands[length(addcommands)+1] <- "x11regression {"
-	  if(!is.null(regfilestart))
-	  addcommands[length(addcommands)+1] <- paste("start=",paste(regfilestart,collapse="."),sep="")
-		else
-	  addcommands[length(addcommands)+1] <- paste("start=",paste(start(tso),collapse="."),sep="")
-	if(!is.null(critical)){
-		if(is.list(critical) & length(critical)>1 &!"AO"%in%names(critical)){
-			cat("X11 Regression only allows for the detection of Additive Outliers (AO)! \n")}
-		else
-			addcommands[length(addcommands)+1] <- paste("critical=",critical,sep="")	
-	}		
-	if(!is.null(outlier_method)){
-		addcommands[length(addcommands)+1] <- paste("outliermethod=",paste(outlier_method,collapse=","),sep="")	
-	}
-	if(!is.null(regvariables))
-		addcommands[length(addcommands)+1] <- paste("variables=(",paste(regvariables,collapse=" "),")",sep="")
-	if(!is.null(reguser))
-		addcommands[length(addcommands)+1] <- paste("user=(",paste(reguser,collapse=" "),")",sep="")
-	if(!is.null(regfile))
-		addcommands[length(addcommands)+1] <- paste("file='",regfile,"'",sep="")				
-	if(!is.null(centeruser))
-	addcommands[length(addcommands)+1] <- paste("centeruser=",centeruser,sep="")
-	if(!is.null(usertype))
-	addcommands[length(addcommands)+1] <- paste("usertype=(",paste(usertype,collapse=" "),")",sep="")
-	if(any(grepl("x11regression",addLines))){
-		if(length(unlist(addLines[which(grepl("x11regression",addLines))]))>1){
-			newLines <- unlist(addLines[which(grepl("x11regression",addLines))])[-1]}
-		else{
-			newLines <- unlist(addLines)[-1]}	
-		length.addcom<- length(addcommands)
-	for(j in 1:length(newLines)){
-		length.addcom <- length.addcom+1
-		addcommands[length.addcom] <- newLines[j]	
-	}}  	
-	  addcommands[length(addcommands)+1] <- "}"	
-  
-	  }#end x11regress
-if(length(unlist(addLines[1]))>1){
-new.spec <- which(!sapply(addLines,function(x)any(grepl(paste(x[[1]],"{"),c(header,addcommands),fixed=TRUE))))
-}else{
-new.spec <- which(!paste(addLines[1],"{")%in%c(header,addcommands))	
-}
-if(length(new.spec)>0){
-for(i in new.spec){
-	addcommands[length(addcommands)+1] <- paste(unlist(addLines[i])[1],"{")
-	if(length(unlist(addLines[i]))>1){
-	newLines <- unlist(addLines[i])[-1]}
-	else{
-	newLines <- unlist(addLines)[-1]	
-	}
-	length.addcom<- length(addcommands)
-	for(j in 1:length(newLines)){
-	length.addcom <- length.addcom +1
-	addcommands[length.addcom] <- newLines[j]	
-	}
-	addcommands[length(addcommands)+1] <- "}"
-}}
-}else{#start option no addLines
-	  
 	  header <- vector()
 	  header[length(header)+1] <- "series{"
-	  header[length(header)+1] <- 'title="R Output for X12a"'
-	  header[length(header)+1] <- paste("decimals=",decimals,sep="")
+	  header[length(header)+1] <- 'title="R Output for x12a"'
 	  header[length(header)+1] <- paste("start=",paste(start(tso),collapse="."),sep="")
 	  if(!is.null(span)){
 		  topaste<-span
@@ -417,47 +100,83 @@ for(i in new.spec){
 		  }
 		  header[length(header)+1] <- paste("modelspan=(",paste(topaste[1:2],collapse=tocollapse[1]),",",paste(topaste[3:4],collapse=tocollapse[2]),")",sep="")
 	  }
+#	  if(!is.null(series.comptype)){
+#		  header[length(header)+1] <- paste("comptype=",series.comptype,sep="") 
+#	  }
+#	  if(!is.null(series.compwt)){
+#		  header[length(header)+1] <- paste("compwt=",series.compwt,sep="") 
+#	  }
+	  
 	  header[length(header)+1] <- paste("period=",period,sep="")
+
+#	  if(!is.null(series.type)){
+#		  header[length(header)+1] <- paste("type=",series.type,sep="") 
+#	  }
+#ERROR:  Argument name "type" not found 
+
 	  header[length(header)+1] <- "data=("
-	  datarows<-vector()
-	  tsov<-as.vector(tso)
-	  for(i in 0:(length(tso)/period)){
-		  datarow<-vector()
-		  for(j in 1:period){
-			  if(!is.na(tsov[period*i+j])){
-				  datarow[j] <- tsov[period*i+j]
-			  }else
-				  datarow[j] <- ""
-		  }
-		  datarows[i+1] <- paste("",paste(datarow,collapse=" "),sep="")
-	  }
+	  datarows<-as.vector(tso)
 	  datarows[length(datarows)+1] <- ")"
 	  datarows[length(datarows)+1] <- "}"
 	  addcommands <- vector()
 	  if(!x11regress){#transform ausschalten falls x11 Regression
 		  addcommands[length(addcommands)+1] <- paste("transform{") 
-	  addcommands[length(addcommands)+1] <- paste("function=",transform,sep="") 
-	  addcommands[length(addcommands)+1] <- "}"
+	  if(is.null(transform.power))
+		  addcommands[length(addcommands)+1] <- paste("function=",transform,sep="") 
+	  else
+		  addcommands[length(addcommands)+1] <- paste("power=",transform.power,sep="") 
+	  if(!is.null(transform.adjust))
+	  	addcommands[length(addcommands)+1] <- paste("adjust=",transform.adjust,sep="") 
+	  	  
+			addcommands[length(addcommands)+1] <- "}"
   	}
-	  if(!is.null(arima)&&!x11regress){
+	if(!is.null(c(arima,sarima,arima.ar,arima.ma))&&!x11regress){
 		  arima <- paste("(",paste(arima,collapse=","),")",sep="")
 		  if(!is.null(sarima))  
 		  sarima <- paste("(",paste(sarima,collapse=","),")",sep="")
 		  addcommands[length(addcommands)+1] <- paste("arima{")
 		  addcommands[length(addcommands)+1] <- paste("model=",arima,sarima,sep="")
-		  addcommands[length(addcommands)+1] <- "}"
+		  	if(!is.null(arima.ar)){
+				arima.ar[is.na(arima.ar)]<-" "
+			  	addcommands[length(addcommands)+1] <- paste("ar=",paste("(",paste(arima.ar,collapse=","),")",sep=""),sep="") 
+			}
+			if(!is.null(arima.ma)){
+				arima.ma[is.na(arima.ma)]<-" "
+				addcommands[length(addcommands)+1] <- paste("ma=",paste("(",paste(arima.ma,collapse=","),")",sep=""),sep="") 
+			}
+				addcommands[length(addcommands)+1] <- "}"
 	  }
-	  if(!is.null(arima)&&automdl&&!x11regress)
+	  if(!is.null(c(arima,sarima,arima.ar,arima.ma))&&automdl&&!x11regress)
 		  cat("Warning: 'automdl' is ignored because an ARIMA model has been specified! \n")
 		  #cat("Arima and Sarima model specifications are ignored, because automdl is activated! \n")
-	  if(any(c(!is.null(regvariables),!is.null(reguser),!is.null(regfile))) &&! x11regress){
+	  if(any(!is.null(c(regvariables,reguser,regfile,aictest,regfilestart,usertype,centeruser))) &&! x11regress){
 		  addcommands[length(addcommands)+1] <- "regression{"
 		  if(!is.null(regvariables))
 			  addcommands[length(addcommands)+1] <- paste("variables=(",paste(regvariables,collapse=" "),")",sep="")
 		  if(!is.null(aictest))
 			  addcommands[length(addcommands)+1] <- paste("aictest=(",aictest,") savelog= aictest",sep="")
-		  if(!is.null(reguser))
+		  if(!is.null(reguser)){
+			  forbidden.regression.user <- c("x11regress:",
+					  "samode:","finmode:","seasonalma:","trendma:","sfmsr:",
+					  "finalxreg","x11irrcrtval:",
+					  "$AO","User-defined$","Automatically Identified Outliers$",
+					  "peaks.seas:","peaks.td:","f2.idseasonal:","d11.f:",
+					  "spcori","spcsa","spcirr",
+					  "f3.m01:","f3.m02:","f3.m03:","f3.m04:","f3.m05:","f3.m06:",
+					  "f3.m07:","f3.m08:","f3.m09:","f3.m10:","f3.m11:",
+					  "f3.q:","f3.qm2:","f3.fail:",
+					  "ssa:","ssfstab:","ssfmov:","ssm7:","ssident:","ssran.","s2.","s3.",
+					  "historytarget","r01.lag","r02.lag","r04.lag","r05.lag","r06","meanssfe")
+			  if(!any(unlist(lapply(forbidden.regression.user,function(x)grepl(x,reguser))))){				  				  
 			  addcommands[length(addcommands)+1] <- paste("user=(",paste(reguser,collapse=" "),")",sep="")
+		  	  }else{
+			  bad.name.regression.user <- unlist(lapply(forbidden.regression.user,function(x)grep(x,reguser,value=TRUE)))
+			  bad.name.index <- which(reguser%in%bad.name.regression.user)
+			  reguser[bad.name.index]<-paste("user_",1:length(bad.name.regression.user),sep="")
+			  cat("Warning: the user paramter/s",bad.name.regression.user,"in the regression argument 'regression.user' has/have been renamed to",reguser[bad.name.index],"due to conflicts! \n")
+			  addcommands[length(addcommands)+1] <- paste("user=(",paste(reguser,collapse=" "),")",sep="")
+			  }
+		  }
 		  if(!is.null(regfile))
 			  addcommands[length(addcommands)+1] <- paste("file='",regfile,"'",sep="")
 		  if(!is.null(regfilestart))
@@ -469,13 +188,19 @@ for(i in new.spec){
 		  addcommands[length(addcommands)+1] <- "}"
 	  }
 	  if(!is.null(outlier) &&! x11regress){
+#		  if((outlier.detection || !is.null(outlier)) &&! x11regress){			  
 		  addcommands[length(addcommands)+1] <- "outlier {"
+#		  if(!is.null(outlier)){
+#			  outlier.detection <- TRUE
 		  if(all(outlier=="all"))
 			  addcommands[length(addcommands)+1] <- "types=(all)"
 		  else
 			  addcommands[length(addcommands)+1] <- paste("types=(",paste(outlier,collapse=" "),")",sep="")
+
+#	  		}
 		  if(!is.null(critical)){
 			  if(is.list(critical)){
+				  names(critical)<-toupper(names(critical))
 				  critval <- vector()
 				  ifelse(is.null(critical$AO),critval[1] <- "",critval[1] <- critical$AO)
 				  ifelse(is.null(critical$LS),critval[2] <- "",critval[2] <- critical$LS)
@@ -484,61 +209,140 @@ for(i in new.spec){
 			  }else{addcommands[length(addcommands)+1] <- paste("critical=(",paste(critical,collapse=","),")",sep="")	
 			  }
 		  }
-		  if(!is.null(outlier_span))
-			  addcommands[length(addcommands)+1] <- paste("span=(",paste(outlier_span,collapse=","),")",sep="")	
+		  if(!is.null(outlier_span)){
+			  topaste<-outlier_span
+			  tocollapse<-c(".",".")
+			  if(any(is.na(outlier_span))){
+				  topaste[which(is.na(outlier_span))]<-""
+				  tocollapse[which(is.na(outlier_span))[2]/2]<-""
+			  }
+			  addcommands[length(addcommands)+1] <- paste("span=(",paste(topaste[1:2],collapse=tocollapse[1]),",",paste(topaste[3:4],collapse=tocollapse[2]),")",sep="")
+		  }
+		  
+#		  if(!is.null(outlier_span))
+#			  addcommands[length(addcommands)+1] <- paste("span=(",paste(outlier_span,collapse=","),")",sep="")	
 		  addcommands[length(addcommands)+1] <- "print=(default)"
 		  if(!is.null(outlier_method) &&! x11regress){
 			  addcommands[length(addcommands)+1] <- paste("method=",paste(outlier_method,collapse=","),sep="")	
 		  }
 		  addcommands[length(addcommands)+1] <- "}"
 	  }
+	  if(identify){
+		  addcommands[length(addcommands)+1] <- "identify {"
+		  
+		  if(!is.null(identify.diff))
+			  addcommands[length(addcommands)+1] <- paste("diff=",paste("(",paste(identify.diff,collapse=","),")",sep=""),sep="")	
+		  if(!is.null(identify.sdiff))
+			  addcommands[length(addcommands)+1] <- paste("sdiff=",paste("(",paste(identify.sdiff,collapse=","),")",sep=""),sep="")
+		  if(!is.null(identify.maxlag))
+			  addcommands[length(addcommands)+1] <- paste("maxlag=",identify.maxlag,sep="")	
+		  addcommands[length(addcommands)+1] <- "}"	
+	  }	
+	  if(slidingspans){
+		  addcommands[length(addcommands)+1] <- "slidingspans{" 
+		  if(!is.null(slidingspans.fixmdl))
+			  addcommands[length(addcommands)+1] <- paste("fixmdl=",slidingspans.fixmdl,sep="")	
+		  
+		  if(!is.null(slidingspans.fixreg))
+			  addcommands[length(addcommands)+1] <- paste("fixreg=(",paste(slidingspans.fixreg,collapse=" "),")",sep="")	
+		  
+		  if(!is.null(slidingspans.length))
+			  addcommands[length(addcommands)+1] <- paste("length=",slidingspans.length,sep="")	
+		  
+		  if(!is.null(slidingspans.numspans))
+			  addcommands[length(addcommands)+1] <- paste("numspans=",slidingspans.numspans,sep="")	
+		  
+		  if(!is.null(slidingspans.outlier))
+			  addcommands[length(addcommands)+1] <- paste("outlier=",slidingspans.outlier,sep="")	
+		  
+		  if(!is.null(slidingspans.start))
+			  addcommands[length(addcommands)+1] <-  paste("start=",paste(slidingspans.start,collapse="."),"",sep="")
+		  
+		  if(!is.null(slidingspans.additivesa))
+			  addcommands[length(addcommands)+1] <- paste("additivesa=",slidingspans.additivesa,sep="")	
+		  
+		  addcommands[length(addcommands)+1] <- "}" 
+	  }
+	  if(history){
+		  addcommands[length(addcommands)+1] <- "history{" 
+		  if(!is.null(history.estimates))
+			  addcommands[length(addcommands)+1] <- paste("estimates=(",paste(history.estimates,collapse=" "),")",sep="")	
+		  
+		  if(history.fixmdl)
+			  addcommands[length(addcommands)+1] <- "fixmdl=yes"
+		  
+		  if(!is.null(history.fixreg))
+			  addcommands[length(addcommands)+1] <- paste("fixreg=(",paste(history.fixreg,collapse=" "),")",sep="")
+		  
+		  if(!is.null(history.outlier))
+			  addcommands[length(addcommands)+1] <- paste("outlier=",history.outlier,sep="")	
+		  
+		  if(!is.null(history.sadjlags))
+			  addcommands[length(addcommands)+1] <- paste("sadjlags=",paste("(",paste(history.sadjlags,collapse=","),")",sep=""),sep="")	
+		  
+		  if(!is.null(history.trendlags))
+			  addcommands[length(addcommands)+1] <- paste("trendlags=",paste("(",paste(history.trendlags,collapse=","),")",sep=""),sep="")	
+		  
+		  if(!is.null(history.start))
+			  addcommands[length(addcommands)+1] <- paste("start=",paste(history.start,collapse="."),"",sep="")
+		  
+		  if(!is.null(history.target))
+			  addcommands[length(addcommands)+1] <- paste("target=",history.target,sep="")
+		  
+		  addcommands[length(addcommands)+1] <- "}" 
+	  }
 	  if(!x11regress){#nicht bei x11 Regression
 		  if(estimate){
 			  addcommands[length(addcommands)+1] <- "estimate {"
-#	if(!is.null(estExact)){
-#		addcommands[length(addcommands)+1] <- paste("exact=",estExact,sep="")	
-			  ##		addcommands[length(addcommands)+1] <- paste("save=(rts)")	
-#	}
 			  if(estOutofsample){	
 				  addcommands[length(addcommands)+1] <- "outofsample=yes"}
 			  addcommands[length(addcommands)+1] <- "print=(default + rts)"
 			  addcommands[length(addcommands)+1] <- "savelog=(aic bic afc)"
-			  addcommands[length(addcommands)+1] <- "}"
-			  addcommands[length(addcommands)+1] <- "check{"
-			  addcommands[length(addcommands)+1] <- "print=(default+specresidual+pacfplot)"
-			  addcommands[length(addcommands)+1] <- "savelog=(nrm lbq)"
-			  addcommands[length(addcommands)+1] <- "}"
+			  addcommands[length(addcommands)+1] <- "}"			  
+			  if(check){
+				  addcommands[length(addcommands)+1] <- "check{"
+				  if(!is.null(check.maxlag))
+					  addcommands[length(addcommands)+1] <- paste("maxlag=",check.maxlag,sep="")	
+				  addcommands[length(addcommands)+1] <- "print=(default+specresidual+pacfplot)"
+				  addcommands[length(addcommands)+1] <- "savelog=(nrm lbq)"
+				  addcommands[length(addcommands)+1] <- "}"
+			  }
 		  }
-		  if(slidingspans){
-			  addcommands[length(addcommands)+1] <- "slidingspans{" 
-			  addcommands[length(addcommands)+1] <- "savelog= percent"
-			  addcommands[length(addcommands)+1] <- "additivesa= percent"
-			  addcommands[length(addcommands)+1] <- "}" 
-		  }
-		  if(automdl && is.null(arima) && is.null(sarima)){
-			  addcommands[length(addcommands)+1] <- "automdl {"
-#			  addcommands[length(addcommands)+1] <- "#acceptdefault=yes"
-			  addcommands[length(addcommands)+1] <- paste("maxorder=(",paste(maxorder,collapse=","),")",sep="")
-			  addcommands[length(addcommands)+1] <- paste("maxdiff=(",paste(maxdiff,collapse=","),")",sep="")
-			  addcommands[length(addcommands)+1] <- "balanced=yes"
+		  if(automdl && is.null(c(arima,sarima,arima.ar,arima.ma))){
+			  addcommands[length(addcommands)+1] <- "automdl{"
+		if(acceptdefault)
+			addcommands[length(addcommands)+1] <- "acceptdefault=yes"
+		else
+			addcommands[length(addcommands)+1] <- "acceptdefault=no"
+		if(balanced)
+			addcommands[length(addcommands)+1] <- "balanced=yes"
+		else
+			addcommands[length(addcommands)+1] <- "balanced=no"
+				
+			maxorder[is.na(maxorder)]<-" "
+			addcommands[length(addcommands)+1] <- paste("maxorder=",paste("(",paste(maxorder,collapse=","),")",sep=""),sep="") 
+			maxdiff[is.na(maxdiff)]<-" "
+			addcommands[length(addcommands)+1] <- paste("maxdiff=",paste("(",paste(maxdiff,collapse=","),")",sep=""),sep="") 
+					
 			  addcommands[length(addcommands)+1] <- "savelog=(adf amd b5m mu)"
 			  addcommands[length(addcommands)+1] <- "}" }
 #Forecasts Backcasts
+		if(!is.null(forecast_years) | !is.null(backcast_years)){
 		  addcommands[length(addcommands)+1] <- "forecast {"
 		  if(!is.null(forecast_years)){
 			  addcommands[length(addcommands)+1] <- paste("maxlead=",forecast_years*frequency(tso),sep="")
 		  }
 		  if(!is.null(backcast_years)){
 			  addcommands[length(addcommands)+1] <- paste("maxback=",backcast_years*frequency(tso),sep="")
-#	save(bct)
 		  }
 		  addcommands[length(addcommands)+1] <- "}"
-		  
+	  }
 	  }#end nicht bei x11 Regression
 	  if(!seats){
 		  addcommands[length(addcommands)+1] <- "x11{"
-		  if(onlytd)
-			  addcommands[length(addcommands)+1] <- "type= trend"
+		  if(!is.null(onlytd)){
+			  addcommands[length(addcommands)+1] <- paste("type=",onlytd,sep="")		
+		 }  			  
 		  if(sfshort)  
 			  addcommands[length(addcommands)+1] <- "sfshort=yes"
 		  if(!is.null(sigmalim)){
@@ -552,7 +356,6 @@ for(i in new.spec){
 		  if(!is.null(trendma)){
 			  addcommands[length(addcommands)+1] <- paste("trendma=",trendma,sep="")		
 		  }
-#x11appendbcst=TRUE,x11appendbcst=FALSE,x11calendarsigma=NULL,x11excludefcst=TRUE,x11final="user",
 		  if(!is.null(x11calendarsigma))
 			  addcommands[length(addcommands)+1] <- paste("calendarsigma=",x11calendarsigma,sep="")
 		  if(x11excludefcst)
@@ -563,10 +366,6 @@ for(i in new.spec){
 			  addcommands[length(addcommands)+1] <- paste("final=(",paste(x11final,collapse=" "),")",sep="")
 		  if(x11appendfcst)
 			  addcommands[length(addcommands)+1] <- "appendfcst=yes" ###forecast		  
-#		  addcommands[length(addcommands)+1] <- "calendarsigma=all"
-#		  addcommands[length(addcommands)+1] <- "excludefcst=yes"
-#		  addcommands[length(addcommands)+1] <- "final=user"
-#		  addcommands[length(addcommands)+1] <- "appendfcst=yes" ###forecast
 		  addcommands[length(addcommands)+1] <- "savelog=all"
 		  addcommands[length(addcommands)+1] <- "}" 
 	  }else{
@@ -591,10 +390,39 @@ for(i in new.spec){
 		  if(!is.null(outlier_method)){
 			  addcommands[length(addcommands)+1] <- paste("outliermethod=",paste(outlier_method,collapse=","),sep="")	
 		  }
+		  if(!is.null(outlier_span)){
+			  topaste<-outlier_span
+			  tocollapse<-c(".",".")
+			  if(any(is.na(outlier_span))){
+				  topaste[which(is.na(outlier_span))]<-""
+				  tocollapse[which(is.na(outlier_span))[2]/2]<-""
+			  }
+			  addcommands[length(addcommands)+1] <- paste("outlierspan=(",paste(topaste[1:2],collapse=tocollapse[1]),",",paste(topaste[3:4],collapse=tocollapse[2]),")",sep="")
+		  }		  
 		  if(!is.null(regvariables))
 			  addcommands[length(addcommands)+1] <- paste("variables=(",paste(regvariables,collapse=" "),")",sep="")
-		  if(!is.null(reguser))
-			  addcommands[length(addcommands)+1] <- paste("user=(",paste(reguser,collapse=" "),")",sep="")
+		  if(!is.null(reguser)){
+			  forbidden.regression.user <- c("x11regress:",
+					  "samode:","finmode:","seasonalma:","trendma:","sfmsr:",
+					  "finalxreg","x11irrcrtval:",
+					  "$AO","User-defined$","Automatically Identified Outliers$",
+					  "peaks.seas:","peaks.td:","f2.idseasonal:","d11.f:",
+					  "spcori","spcsa","spcirr",
+					  "f3.m01:","f3.m02:","f3.m03:","f3.m04:","f3.m05:","f3.m06:",
+					  "f3.m07:","f3.m08:","f3.m09:","f3.m10:","f3.m11:",
+					  "f3.q:","f3.qm2:","f3.fail:",
+					  "ssa:","ssfstab:","ssfmov:","ssm7:","ssident:","ssran.","s2.","s3.",
+					  "historytarget","r01.lag","r02.lag","r04.lag","r05.lag","r06","meanssfe")
+			  if(!any(unlist(lapply(forbidden.regression.user,function(x)grepl(x,reguser))))){				  				  
+				  addcommands[length(addcommands)+1] <- paste("user=(",paste(reguser,collapse=" "),")",sep="")
+			  }else{
+				  bad.name.regression.user <- unlist(lapply(forbidden.regression.user,function(x)grep(x,reguser,value=TRUE)))
+				  bad.name.index <- which(reguser%in%bad.name.regression.user)
+				  reguser[bad.name.index]<-paste("user_",1:length(bad.name.regression.user),sep="")
+				  cat("Warning: the user paramter/s",bad.name.regression.user,"in the regression argument 'regression.user' has/have been renamed to",reguser[bad.name.index],"due to conflicts! \n")
+				  addcommands[length(addcommands)+1] <- paste("user=(",paste(reguser,collapse=" "),")",sep="")
+			  }
+		  }
 		  if(!is.null(regfile))
 			  addcommands[length(addcommands)+1] <- paste("file='",regfile,"'",sep="")				
 		  if(!is.null(centeruser))
@@ -605,10 +433,9 @@ for(i in new.spec){
 		  
 	  }
 	  
-}#end option no addLines
+
   con <- file(paste(file,".spc",sep=""))
-#  if(!is.null(addLines))
-#    addcommands <- c(addcommands,addLines)
+
   writeLines(c(header,datarows,addcommands),con)
   close(con)
 
@@ -647,7 +474,7 @@ for(i in new.spec){
 #  out <- list()
 
 
-  out <- readx12Out(file,freq_series=frequency(tso),start_series=start(tso),end_series=end(tso),tblnames=tblnames,Rtblnames=Rtblnames,transform=transform,x11regress=x11regress,outlier=outlier,showWarnings=showWarnings,keep_x12out=keep_x12out)
+  out <- readx12Out(file,freq_series=frequency(tso),start_series=start(tso),end_series=end(tso),tblnames=tblnames,Rtblnames=Rtblnames,transform=transform,slidingspans=slidingspans,history=history,x11regress=x11regress,outlier=outlier,showWarnings=showWarnings,keep_x12out=keep_x12out)
 #  Rtblnames <- c("Original series", "Final seasonal factors", "Final seasonally adjusted data", "Final trend cycle",
 #		    "Final irregular components","Combined adjustment factors","Final weights for irregular component",
 #			"Final replacements for SI ratios",
@@ -697,17 +524,17 @@ out
 
 }
 
-readx12Out <- function(file,tblnames=NULL,Rtblnames=NULL,freq_series,start_series,end_series,seats=FALSE,transform,x11regress,outlier,showWarnings,keep_x12out){
+readx12Out <- function(file,tblnames=NULL,Rtblnames=NULL,freq_series,start_series,end_series,seats=FALSE,transform,slidingspans,history,x11regress,outlier,showWarnings,keep_x12out){
   out<-list()
   Rtblnames <- c("Original series", "Final seasonal factors", "Final seasonally adjusted data", "Final trend cycle",
       "Final irregular components","Combined adjustment factors","Final weights for irregular component",
       "Final replacements for SI ratios",
-      "Differenced, transformed, seasonally adjusted data","Final unmodified SI Ratios","Orig2",
+      "Differenced, transformed, seasonally adjusted data","Final unmodified SI Ratios","Orig2","Trading day component",
       Rtblnames)
   if(seats==TRUE)
-    tblnames <- c("a1", "s10", "s11", "s12", "s13","s16","c17","s9","e2","d8","b1", tblnames)
+    tblnames <- c("a1", "s10", "s11", "s12", "s13","s16","c17","s9","e2","d8","b1","td", tblnames)
   else
-    tblnames <- c("a1", "d10", "d11", "d12", "d13","d16","c17","d9","e2","d8","b1", tblnames)
+    tblnames <- c("a1", "d10", "d11", "d12", "d13","d16","c17","d9","e2","d8","b1","td", tblnames)
   if(!(file=="Example_for_X1")){
     sp_file <- strsplit(file,"/")[[1]]
     filename <- paste(paste(sp_file[-length(sp_file)],collapse="/"),"/gra/",sp_file[length(sp_file)],sep="")
@@ -755,8 +582,10 @@ if(!file.exists(paste(filename,".","udg",sep=""))){
 	}
 	udg <- readLines(con=paste(filename,".","udg",sep=""),n=-1)
 #errorfile <- readLines(con=paste(file,".","err",sep=""),n=-1)
-#filename <- "M:/Meraner/Workspace/Saisonbereinigung_Test/gra/Rout"
+#filename <- "M:/Meraner/Workspace/Saisonbereinigung_Test/gra/Air"
+#file<-"M:/Meraner/Workspace/Saisonbereinigung_Test/Air"
 #file<-"M:/Meraner/Workspace/Saisonbereinigung_Test/Rout"
+#filename <- "M:/Meraner/Workspace/Saisonbereinigung_Test/gra/Rout"
 
 	
 	if(showWarnings && file.exists(paste(file,".","err",sep=""))){
@@ -798,14 +627,20 @@ if(!file.exists(paste(filename,".","udg",sep=""))){
     if(file.exists(paste(filename,".",tblnames[i],sep="")))
       out[[tblnames[i]]] <- ts(read.table(paste(filename,".",tblnames[i],sep=""),header=FALSE,skip=2,sep="	",na.strings="-999")[,2],frequency=freq_series,start=start_series)
   }
-  if(!x11regress){
-  spnames <- c("Spectrum_AdjOri","Spectrum_SA","Spectrum_Irr","Spectrum_Rsd")
-  sptblnames <- c("sp0", "sp1", "sp2","spr")
-	}else{
-	spnames <- c("Spectrum_AdjOri","Spectrum_SA","Spectrum_Irr")
-	sptblnames <- c("sp0", "sp1", "sp2")	
-	}
-  if(!seats){
+#  if(!x11regress){
+#  spnames <- c("Spectrum_AdjOri","Spectrum_SA","Spectrum_Irr","Spectrum_Rsd")
+#  sptblnames <- c("sp0", "sp1", "sp2","spr")
+#	}else{
+#	spnames <- c("Spectrum_AdjOri","Spectrum_SA","Spectrum_Irr")
+#	sptblnames <- c("sp0", "sp1", "sp2")	
+#	}
+
+sptblnames <- vector()
+for(i in c("sp0", "sp1", "sp2","spr")){
+if(file.exists(paste(filename,".",i,sep="")))
+sptblnames <- c(sptblnames,i)	
+}
+	if(!seats){
     for(i in 1:length(sptblnames)){
       out[[sptblnames[i]]] <- read.table(paste(filename,".",sptblnames[i],sep=""),header=FALSE,skip=2,sep="	")[,2:3]
       names(out[[sptblnames[i]]]) <- c("frequency","spectrum")
@@ -851,17 +686,13 @@ out[["backcast"]]$upperci <-ts(bct[,4],frequency=freq_series,end=end_backcast)
 
 }
 #Testbeispiele:
-#filename <- "M:/Meraner/Workspace/Saisonbereinigung_Test/gra/Rout"
+#filename <- "M:/Meraner/Workspace/Saisonbereinigung_Test/gra/Air"
 #filename <- "M:/Meraner/Saisonbereinigung/x12probierfiles/loge_d"  
 #filename <- "M:/Meraner/Saisonbereinigung/x12probierfiles/a"  
 #filename <- "M:/Meraner/Saisonbereinigung/x12probierfiles/b05"
+#file<-"M:/Meraner/Workspace/Saisonbereinigung_Test/Air"
 #filename <- "M:/Meraner/Workspace/Saisonbereinigung_Test/gra/Rout"
-#file<-"M:/Meraner/Workspace/Saisonbereinigung_Test/Rout"
 
-
-#if(file.exists(paste(filename,".",tblnames[i],sep="")))
-# RegARIMA Option:
-#wieder entauskommentieren?
 #udg <- readLines(con=paste(filename,".","udg",sep=""),n=-1)
 
 
@@ -882,6 +713,8 @@ dglist <- c("x11regress:","transform:","samode:","finmode:","seasonalma:","trend
 		  "spcori",
 		  "spcsa",
 		  "spcirr",
+		  "f3.m01:","f3.m02:","f3.m03:","f3.m04:","f3.m05:","f3.m06:",
+		  "f3.m07:","f3.m08:","f3.m09:","f3.m10:","f3.m11:",
 		  "f3.q:","f3.qm2:","f3.fail:",
 		  "loglikelihood:","aic:","aicc:","bic:","hq:","aape")
   
@@ -901,21 +734,42 @@ dglist <- c("x11regress:","transform:","samode:","finmode:","seasonalma:","trend
 		  "spcori",
 		  "spcsa",
 		  "spcirr",
+		  "m1","m2","m3","m4","m5","m6","m7","m8",
+		  "m9","m10","m11",
 		  "q","q2","nmfail",
 		  "loglikelihood","aic","aicc","bic","hq","aape") 
 
-  if(transform=="auto" &&!x11regress){#x11regress Abfrage hier eigentl nicht mehr notw
-	  dglist[length(dglist)+1]<-"aictrans:"
-  dglistnames[length(dglistnames)+1]<-"autotransform"
-}
+	if(transform=="auto"){# &&!x11regress --- x11regress Abfrage hier eigentl nicht mehr notw
+		dglist[length(dglist)+1]<-"aictrans:"
+		dglistnames[length(dglistnames)+1]<-"autotransform"
+	}
 
   numvariables <- c("nout","nautoout","nalmostout",
 		  "crit","spcrsd",
 		  "spcori",
 		  "spcsa",
 		  "spcirr",
+		  "m1","m2","m3","m4","m5","m6","m7","m8",
+		  "m9","m10","m11",
 		  "q","q2","nmfail","seasonalma","trendma","finalseasonalma",
 		  "loglikelihood","aic","aicc","bic","hq","aape")
+  
+  if(slidingspans){
+	  dglist[(length(dglist)+1):(length(dglist)+8)]<-c("ssa:","ssfstab:","ssfmov:","ssm7:","ssident:",
+			  "ssran.","s2.","s3.")
+	  
+	  dglistnames[(length(dglistnames)+1):(length(dglistnames)+8)]<-c("ss.options","ss.stabseas","ss.movseas","ss.m7","ss.idseas",
+			  "ss.S1","ss.S2","ss.S3")
+  }
+  if(history){
+	  dglist[(length(dglist)+1):(length(dglist)+7)]<-c("historytarget",
+			  "r01.lag","r02.lag","r04.lag","r05.lag","r06","meanssfe")
+	  
+	  dglistnames[(length(dglistnames)+1):(length(dglistnames)+7)]<-c("h.target",
+			  "h.R1","h.R2","h.R4","h.R5","h.R6","h.meanssfe")
+  }
+  
+  
   dg <- lapply(dglist,function(x)grep(x,udg,value=TRUE,fixed=TRUE))
 
 #Extrawurst fuer Regression variables Teil 1:
@@ -934,7 +788,8 @@ if(length(dg[[which(dglist=="finalreg")]])>1){
   if(length(othername)>0){
   regvar <- regvar[-othername]}
 #End Extrawurst Teil 1
-  empty <- which(lapply(dg,function(x)length(x))==0)
+  empty <- which(lapply(dg,function(x)length(x))==0)  
+  dglist[which(dglist%in%grep("$",grep(":",dglist[empty],invert=TRUE,fixed=TRUE,value=TRUE),invert=TRUE,fixed=TRUE,value=TRUE))]<-paste(grep("$",grep(":",dglist[empty],invert=TRUE,fixed=TRUE,value=TRUE),invert=TRUE,fixed=TRUE,value=TRUE),":",sep="")  
   dg[empty] <- paste(gsub("$",replacement=":",dglist[empty],fixed=TRUE),"-")
   dg <- lapply(dg,function(x)strsplit(x,": "))
   names(dg)<- dglistnames
@@ -1042,6 +897,8 @@ if(any(grepl("nregderived:",udg,fixed=TRUE))){
 			"spcori",
 			"spcsa",
 			"spcirr",
+			"f3.m01:","f3.m02:","f3.m03:","f3.m04:","f3.m05:","f3.m06:",
+			"f3.m07:","f3.m08:","f3.m09:","f3.m10:","f3.m11:",
 			"f3.q:","f3.qm2:","f3.fail:")
 	
 #Neue Variablennamen:
@@ -1055,12 +912,32 @@ if(any(grepl("nregderived:",udg,fixed=TRUE))){
 			"spcori",
 			"spcsa",
 			"spcirr",
+			"m1","m2","m3","m4","m5","m6","m7","m8",
+			"m9","m10","m11",
 			"q","q2","nmfail") 
 	numvariables <- c("crit",
 			"spcori",
 			"spcsa",
 			"spcirr",
+			"m1","m2","m3","m4","m5","m6","m7","m8",
+			"m9","m10","m11",
 			"q","q2","nmfail","seasonalma","trendma","finalseasonalma")
+	
+	if(slidingspans){
+		dglist[(length(dglist)+1):(length(dglist)+8)]<-c("ssa:","ssfstab:","ssfmov:","ssm7:","ssident:",
+				"ssran.","s2.","s3.")
+		
+		dglistnames[(length(dglistnames)+1):(length(dglistnames)+8)]<-c("ss.options","ss.stabseas","ss.movseas","ss.m7","ss.idseas",
+				"ss.S1","ss.S2","ss.S3")
+	}
+	if(history){
+		dglist[(length(dglist)+1):(length(dglist)+7)]<-c("historytarget",
+				"r01.lag","r02.lag","r04.lag","r05.lag","r06","meanssfe")
+		
+		dglistnames[(length(dglistnames)+1):(length(dglistnames)+7)]<-c("h.target",
+				"h.R1","h.R2","h.R4","h.R5","h.R6","h.meanssfe")
+	}
+	
 	dg <- lapply(dglist,function(x)grep(x,udg,value=TRUE,fixed=TRUE))
 #Extrawurst fuer Regression variables Teil 1:
 if(length(dg[[which(dglist=="finalxreg")]])>1){
@@ -1079,12 +956,17 @@ dg[[which(dglist=="finalxreg")]]<-dg[[which(dglist=="finalxreg")]][-grep("nfinal
 #End Extrawurst Teil 1
 	
 	empty <- which(lapply(dg,function(x)length(x))==0)
+	dglist[which(dglist%in%grep("$",grep(":",dglist[empty],invert=TRUE,fixed=TRUE,value=TRUE),invert=TRUE,fixed=TRUE,value=TRUE))]<-paste(grep("$",grep(":",dglist[empty],invert=TRUE,fixed=TRUE,value=TRUE),invert=TRUE,fixed=TRUE,value=TRUE),":",sep="")  
 	dg[empty] <- paste(gsub("$",replacement=":",dglist[empty],fixed=TRUE),"-")
 	dg <- lapply(dg,function(x)strsplit(x,": "))
 	names(dg)<- dglistnames
 	
 	if(length(which(dg[["outlier"]]%in%dg[["autooutlier"]]))>0){
 	dg[["outlier"]]<-dg[["outlier"]][-which(dg[["outlier"]]%in%dg[["autooutlier"]])]}
+	if(length(dg[["outlier"]])==0){
+	dg["outlier"] <- list(strsplit(paste("outlier","-")," ",fixed=TRUE))
+	empty <- c(empty,which(names(dg)=="outlier"))
+	}
 
 grone <- which(lapply(1:length(dg),function(x){length(dg[[x]])})>1)
 grone.nodoll <- unlist(lapply(grep("$",dglist[grone],fixed=TRUE,value=TRUE,invert=TRUE),function(x){
@@ -1201,7 +1083,6 @@ suppressWarnings(for(i in which(names(dg) %in% numvariables)){
 		}
 	}})	
 
-
 sel <- c("userdefined","autooutlier","outlier",reglistnames) #werden extra behandelt
 
 for(i in which(names(dg) %in% sel)[!which(names(dg) %in% sel)%in%empty]){
@@ -1215,14 +1096,301 @@ for(i in which(names(dg) %in% sel)[!which(names(dg) %in% sel)%in%empty]){
 	}}	
 
 if("almostoutlier"%in%names(dg)){
-if(!which(names(dg)=="almostoutlier")%in%empty){
-	for(j in 1:length(dg[["almostoutlier"]])){
-		#cat("j=",j, "\n")
-	dg[["almostoutlier"]][[j]] <- strsplit(dg[["almostoutlier"]][[j]],"\\s+")
-	dg[["almostoutlier"]][[j]][[1]]<-as.numeric(dg[["almostoutlier"]][[j]][[1]])
-	names(dg[["almostoutlier"]][[j]][[1]])<- c("tval_AO","tval_LS","tval_TC")	
-}}
+	if(!which(names(dg)=="almostoutlier")%in%empty){
+		for(j in 1:length(dg[["almostoutlier"]])){
+			#cat("j=",j, "\n")
+			dg[["almostoutlier"]][[j]] <- strsplit(dg[["almostoutlier"]][[j]],"\\s+")
+			dg[["almostoutlier"]][[j]][[1]]<-as.numeric(dg[["almostoutlier"]][[j]][[1]])
+			names(dg[["almostoutlier"]][[j]][[1]])<- c("tval_AO","tval_LS","tval_TC")	
+		}}
 }
+
+
+if(slidingspans){
+
+### S 0.
+if(dg[[which(names(dg) %in% "ss.options")]][[1]]!="-"){
+ss.options <- as.list(as.numeric(unlist(strsplit(dg[[which(names(dg) %in% "ss.options")]][[1]],"\\s+"))))
+names(ss.options)<-c("nSpans","lSpans","period1span1","year1span1")
+dg[[which(names(dg) %in% "ss.options")]] <- ss.options
+}
+
+
+
+#ss.out <- c("ss.stabseas","ss.movseas","ss.m7","ss.idseas")
+#suppressWarnings(for(i in which(names(dg) %in% ss.out)){
+#			 	out.vec <- unlist(strsplit(dg[[i]][[1]],"\\s+"))
+#			 	if(length(which(is.na(as.numeric(out.vec))))==0){
+#						 		dg[[i]][[1]] <- as.numeric(out.vec)	
+#						 	}else{	
+#						 	dg[[i]][[1]] <- out.vec
+#						 	}
+#			 })
+
+ss.out <- c("ss.stabseas","ss.movseas","ss.m7","ss.idseas")
+ss.S0 <-dg[which(names(dg) %in% ss.out)]
+rn.S0<-names(dg)[which(names(dg) %in% ss.out)]
+ss.S0 <- strsplit(unlist(ss.S0),"\\s+")			
+dims <- lapply(ss.S0,length)
+if(any(dims>1)){
+	rn.S0 <- rn.S0[which(dims>1)]
+	ss.S0 <- as.data.frame(t(data.frame(do.call(rbind,ss.S0[which(dims>1)]))))
+	ss.S0[,-which(rn.S0=="ss.idseas")]<-apply(ss.S0[,-which(rn.S0=="ss.idseas")],2,as.numeric)	
+	row.names(ss.S0)<- paste("span",1:(dim(ss.S0)[1]),sep="")
+	colnames(ss.S0)<-gsub("ss.","",rn.S0)
+
+	
+	names(dg)[[which(names(dg)=="ss.stabseas")]]<-"ss.seasTests"
+ 	dg <- dg[-which(names(dg) %in% c("ss.movseas","ss.m7","ss.idseas"))]
+	dg[[which(names(dg)=="ss.seasTests")]]  <- ss.S0	
+}
+
+
+
+
+### S 1.
+
+if(any(dg[[which(names(dg)=="ss.S1")]]!="-")){
+ss.S1split <- dg[[which(names(dg)=="ss.S1")]]
+ss.S1split <- strsplit(unlist(ss.S1split),"\\s+")
+dims <- lapply(ss.S1split,length)
+
+ss.S1 <- data.frame(do.call(rbind,ss.S1split[which(dims==unique(dims)[[1]])]))
+ss.S1[,1]<-as.character(ss.S1[,1])
+ss.S1[,-1]<-apply(ss.S1[,-1],2,as.numeric)
+row.names(ss.S1)<-NULL
+colnames(ss.S1)<-c("period", paste("span",1:(unique(dims)[[1]]-3),sep=""), "maxPercDiff", "allSpans")
+
+ss.summaryS1 <- data.frame(do.call(rbind,ss.S1split[which(dims==unique(dims)[[2]])]),stringsAsFactors=FALSE)
+ss.summaryS1<-apply(ss.summaryS1,2,as.numeric)
+row.names(ss.summaryS1) <- c(paste("span",1:(dim(ss.summaryS1)[1]-1),sep=""),"allSpans")
+colnames(ss.summaryS1)<-c("min","max","range")
+
+dg[[which(names(dg)=="ss.S1")]]  <- list(ss.S1=ss.S1,ss.summaryS1=ss.summaryS1)
+}
+
+### S 2.
+if(any(dg[[which(names(dg)=="ss.S2")]]!="-")){
+ss.S2 <- dg[[which(names(dg)=="ss.S2")]]
+ss.S2split <- dg[[which(names(dg)=="ss.S2")]]
+ss.S2split <- strsplit(unlist(ss.S2split),"\\s+")
+dims <- lapply(ss.S2split,length)
+if(any(dims>1)){
+ss.S2 <- data.frame(apply(do.call(rbind,ss.S2split[which(dims>1)]),2,as.numeric))
+rn.S2 <- which(c("s2.a.per", "s2.b.per", "s2.c.per", "s2.d.per", "s2.e.per")%in%names(ss.S2split))
+row.names(ss.S2) <- c("a.seasFac","b.td","c.SA","d.period-period","e.year-year")[rn.S2]
+colnames(ss.S2)<-c("nUnstable","nPeriods","percUnstable")
+dg[[which(names(dg)=="ss.S2")]]  <- ss.S2
+}
+}
+
+### S 3.
+#remove histograms
+#remove hinges (no standard format)
+if(any(dg[[which(names(dg)=="ss.S3")]]!="-")){
+ss.S3 <- dg[[which(names(dg)=="ss.S3")]]
+ss.S3 <- ss.S3[-grep("thist",names(ss.S3))]
+ss.S3 <- ss.S3[-grep("hinge",names(ss.S3))]
+
+ss.S3split <- strsplit(unlist(ss.S3),"\\s+")
+#dims <- lapply(ss.S3split,length)
+ss.S3 <- data.frame(do.call(rbind,ss.S3split),stringsAsFactors=FALSE)
+ss.S3[,-1] <- apply(ss.S3[,-1],2,as.numeric)
+colnames(ss.S3) <- c("periodYear","nBreakdowns","ampd")
+
+ss.S3.new <- list()
+ss.S3.names <- vector()
+for( i in 1:5){
+s3.names <- c("s3.a.brk", "s3.b.brk", "s3.c.brk", "s3.d.brk", "s3.e.brk")
+ss.S3.new.obj <-ss.S3[grep(s3.names[i],rownames(ss.S3)),]
+if(dim(ss.S3.new.obj)[1]!=0){
+rownames(ss.S3.new.obj)<-NULL
+ss.S3.new[[length(ss.S3.new)+1]] <-ss.S3.new.obj
+ss.S3.names[length(ss.S3.names)+1] <- c("a.seasFac","b.td","c.SA","d.period-period","e.year-year")[i]
+}
+}	
+ss.S3 <- ss.S3.new
+names(ss.S3) <- ss.S3.names
+dg[[which(names(dg)=="ss.S3")]]  <- ss.S3
+}
+
+}	
+	
+if(history){
+### R 1. - R 6.
+	
+h.tablenames <- c("h.R1","h.R2","h.R4","h.R5","h.R6")
+for(i in 1:length(h.tablenames)){
+if(any(unlist(dg[h.tablenames[i]])!="-")){	
+lags <- unique(substr(names(dg[h.tablenames[i]][[1]]),1,9))	
+if(any(grepl("aarmo",lags)))
+lags <- lags[-grep("aarmo",lags)]
+colnames.lags <- gsub(paste("r0",substr(h.tablenames[i],4,4),".lag0",sep=""),"lag",lags)
+colnames.lags <- gsub(paste("r0",substr(h.tablenames[i],4,4),".lag",sep=""),"lag",colnames.lags)
+colnames.lags <- gsub(paste("r0",substr(h.tablenames[i],4,4),".proj.",sep=""),"proj",colnames.lags)
+
+dates <- date.list <- total.list <- hingeValues.list <- hinges <- list()
+for(j in 1:length(lags)){
+table <- strsplit(unlist(dg[h.tablenames[i]][[1]]),"\\s+")
+table <- table[grep(lags[j],names(table))]
+
+date <- table[-c(grep(".all",names(table)),grep(".hinge",names(table)))]
+date <- do.call(rbind,date)
+rownames(date)<-NULL
+date.list[[length(date.list)+1]]<-date[,2]
+dates[[length(dates)+1]] <- date[,1]
+
+total <- unlist(table[grep(".all",names(table))])
+rownames(total)<-NULL
+total.list[[length(total.list)+1]]<-total
+
+hingeValues <- table[grep(".hinge",names(table))]
+hingeValues <- do.call(rbind,hingeValues)
+hinges[[length(hinges)+1]] <- do.call(rbind,strsplit(rownames(hingeValues),"hinge."))[,2]
+#rownames(hingeValues)<-NULL
+hingeValues.list[[length(hingeValues.list)+1]]<-hingeValues
+}
+
+if(length(lags)>1){
+#date
+if(all(lapply(dates,length)==length(unique(unlist(dates))))){								
+	date <- as.data.frame(cbind(dates[[1]],do.call(cbind,date.list)),stringsAsFactors=FALSE)
+	colnames(date)<-c("date",colnames.lags)
+	date[,-1]<-apply(date[,-1],2,as.numeric)
+	rownames(date)<-NULL
+}else{
+	all.dates.sorted <- all.dates <- unique(unlist(dates))
+	months <-c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")	
+	if(any(all.dates%in%months)){
+	all.dates.sorted[1:length(suppressWarnings(which(is.na(as.numeric(all.dates)))))] <- all.dates[suppressWarnings(which(is.na(as.numeric(all.dates))))][match(months,all.dates[suppressWarnings(which(is.na(as.numeric(all.dates))))])]
+	}else{
+		quarters <- c("1st",  "2nd",  "3rd",  "4th")	
+		all.dates.sorted[1:length(suppressWarnings(which(is.na(as.numeric(all.dates)))))] <- all.dates[suppressWarnings(which(is.na(as.numeric(all.dates))))][match(quarters,all.dates[suppressWarnings(which(is.na(as.numeric(all.dates))))])]		
+	}	
+	all.dates.sorted[(length(suppressWarnings(which(is.na(as.numeric(all.dates)))))+1):length(all.dates.sorted)] <- as.character(sort(suppressWarnings(as.numeric(all.dates[which(!is.na(as.numeric(all.dates)))]))))
+	all.dates <- all.dates.sorted
+	for(k in 1:length(dates)){
+		date.list[[k]] <- c(date.list[[k]],rep(NA,length(all.dates[which(!all.dates%in%dates[[k]])])))
+		dates[[k]] <- c(dates[[k]],all.dates[which(!all.dates%in%dates[[k]])])
+		date.list[[k]] <- date.list[[k]][ match(all.dates,dates[[k]])]
+	}	
+	date <- as.data.frame(cbind(all.dates,do.call(cbind,date.list)),stringsAsFactors=FALSE)
+	colnames(date)<-c("date",colnames.lags)
+	date[,-1]<-apply(date[,-1],2,as.numeric)
+	rownames(date)<-NULL
+}
+#total
+total <- as.data.frame(do.call(cbind,total.list),stringsAsFactors=FALSE)	
+total[,1:(dim(total)[2])] <- as.numeric(total)
+rownames(total)<-NULL
+colnames(total)<-colnames.lags
+#hingeValues			
+	if(length(unique(unlist(hinges)))==length(unlist(hinges))/length(lags)){
+		hingeValues <- as.data.frame(cbind(unlist(hinges[[1]]),do.call(cbind,hingeValues.list)),stringsAsFactors=FALSE)	
+		rownames(hingeValues)<-NULL
+		colnames(hingeValues)<-c("hinges",colnames.lags)
+		hingeValues[,-1]<-apply(hingeValues[,-1],2,as.numeric)
+	}else{
+		hingeValues <- as.data.frame(do.call(cbind,lapply(1:length(lags),function(x)cbind(hinges[[x]],hingeValues.list[[x]]))),stringsAsFactors=FALSE)
+		rownames(hingeValues)<-NULL
+		colnames(hingeValues)[seq(from=1,by=2,length.out=length(lags))]<-rep("hinges",length(lags))
+		colnames(hingeValues)[seq(from=2,by=2,length.out=length(lags))]<-colnames.lags	
+	}
+}else{ 	
+#date
+date <- as.data.frame(cbind(unlist(dates),unlist(date.list)),stringsAsFactors=FALSE)	
+colnames(date)<-c("date",colnames.lags)
+date[,1]<-as.character(date[,1])
+date[,2]<-as.numeric(date[,2])
+rownames(date)<-NULL
+#total
+total <- as.data.frame(do.call(cbind,total.list),stringsAsFactors=FALSE)	
+total[1]<-as.numeric(total)
+colnames(total)<-colnames.lags
+rownames(total)<-NULL
+#hingeValues
+	hingeValues <- as.data.frame(cbind(unlist(hinges[[1]]),do.call(cbind,hingeValues.list)),stringsAsFactors=FALSE)	
+	rownames(hingeValues)<-NULL
+	colnames(hingeValues)<-c("hinges",colnames.lags)
+	hingeValues[,-1]<-as.numeric(hingeValues[,-1])
+}
+dg[[which(names(dg) %in% h.tablenames[i])]] <- list(date=date,total=total,hingeValues=hingeValues)
+}}
+
+
+### R 7.
+if(file.exists(paste(filename,".","lkh",sep=""))){
+	h.R7 <- readLines(con=paste(filename,".","lkh",sep=""),n=-1)
+	names.h.R7 <- c("date","loglikelihood","aicc")
+	h.R7 <- data.frame(do.call(rbind,lapply(strsplit(h.R7[-(1:2)],"\t"),as.numeric)))
+	colnames(h.R7)<-names.h.R7
+	dg[[length(dg)+1]]<-h.R7
+	names(dg)[[length(dg)]]<-"h.R7"
+}
+
+### R 8.
+if(file.exists(paste(filename,".","fce",sep=""))){
+	h.R8 <- readLines(con=paste(filename,".","fce",sep=""),n=-1)
+	names.h.R8 <- gsub("Sum","sum",gsub("\\(|\\)","",unlist(strsplit(h.R8[1],"\t"))))	
+	h.R8 <- data.frame(do.call(rbind,lapply(strsplit(h.R8[-(1:2)],"\t"),as.numeric)))
+	colnames(h.R8)<-names.h.R8
+	rownames(h.R8)<-NULL
+	h.meanssfe <- as.data.frame(t(as.numeric(unlist(strsplit(unlist(dg[["h.meanssfe"]]),"\\s+")))))
+	colnames(h.meanssfe)<-gsub("sumSqFcstError","lead",names.h.R8[-1])
+	rownames(h.meanssfe)<-NULL	
+	dg[[length(dg)+1]]<-list(h.R8=h.R8,meanSumSqFcstError=h.meanssfe)
+	names(dg)[[length(dg)]]<-"h.R8"
+	dg <- dg[-which(names(dg) %in% "h.meanssfe")]
+}
+
+}#end history
+
+### identify: autocorrealtions of the residuals
+if(file.exists(paste(filename,".","iac",sep=""))){
+	iac <- readLines(con=paste(filename,".","iac",sep=""),n=-1)
+	i.tables <- grep("\\$diff",iac)
+	#grep("\\$sdiff",iac,value=TRUE)
+	name.table <- iac.list <- list()
+	for(i in 1:length(i.tables)){
+	name.table[[length(name.table)+1]] <- gsub("= ","",gsub("\\$","",paste(iac[i.tables[i]],iac[i.tables[i]+1],sep="_")))
+	#names.iac <- gsub("\\(|\\)","",unlist(strsplit(iac[i.tables[i]+2],"\t")))	
+	names.iac <- c("lag","sample.acf","stderr.acf","Ljung-Box.q","df.q","pval" )
+	if(i.tables[i]!=i.tables[length(i.tables)])
+	iac.table <- data.frame(do.call(rbind,lapply(strsplit(iac[(i.tables[i]+4):(i.tables[i+1]-1)],"\t"),as.numeric)))
+	else
+	iac.table <- data.frame(do.call(rbind,lapply(strsplit(iac[(i.tables[i]+4):length(iac)],"\t"),as.numeric)))
+	colnames(iac.table)<-names.iac
+	rownames(iac.table)<-NULL
+	iac.list[[length(iac.list)+1]] <- iac.table
+	}
+	names(iac.list)<-name.table
+	dg[[length(dg)+1]]<-iac.list
+	names(dg)[[length(dg)]]<-"rsd.iac"	
+}
+
+### identify: partial autocorrealtions of the residuals
+if(file.exists(paste(filename,".","ipc",sep=""))){
+	ipc <- readLines(con=paste(filename,".","ipc",sep=""),n=-1)
+	i.tables <- grep("\\$diff",ipc)
+	#grep("\\$sdiff",ipc,value=TRUE)
+	name.table <- ipc.list <- list()
+	for(i in 1:length(i.tables)){
+		name.table[[length(name.table)+1]] <- gsub("= ","",gsub("\\$","",paste(ipc[i.tables[i]],ipc[i.tables[i]+1],sep="_")))
+		#names.ipc <- gsub("\\(|\\)","",unlist(strsplit(ipc[i.tables[i]+2],"\t")))	
+		names.ipc <- c("lag","sample.pacf","stderr.pacf")
+		if(i.tables[i]!=i.tables[length(i.tables)])
+			ipc.table <- data.frame(do.call(rbind,lapply(strsplit(ipc[(i.tables[i]+4):(i.tables[i+1]-1)],"\t"),as.numeric)))
+		else
+			ipc.table <- data.frame(do.call(rbind,lapply(strsplit(ipc[(i.tables[i]+4):length(ipc)],"\t"),as.numeric)))
+		colnames(ipc.table)<-names.ipc
+		rownames(ipc.table)<-NULL
+		ipc.list[[length(ipc.list)+1]] <- ipc.table
+	}
+	names(ipc.list)<-name.table
+	dg[[length(dg)+1]]<-ipc.list
+	names(dg)[[length(dg)]]<-"rsd.ipc"	
+}
+
 
 if(transform=="auto" && dg[["transform"]]!="Automatic selection" &&!x11regress){
 dg[["autotransform"]] <- dg[["transform"]] 
@@ -1319,16 +1487,32 @@ names(dg)[[length(dg)]]<-"rsd.acf2"
 ##	names(dg)[[length(dg)]]<-"bct"
 #out$backcast <- bct	
 #}
-
+dg[[length(dg)+1]]<- file
+names(dg)[[length(dg)]]<-"tsName"	
 #out <- list()
-out[["dg"]] <- list()
-out[["dg"]] <- dg
+dg[[length(dg)+1]]<- freq_series
+names(dg)[[length(dg)]]<-"frequency"	
+
+if(any(grepl("span:",udg,fixed=TRUE))){
+	span <- grep("span:",udg,fixed=TRUE,value=TRUE)
+	if(length(span)>1){
+		dg[[length(dg)+1]]<- span
+		names(dg)[[length(dg)]]<-"span"
+	}else{
+		span <- str_trim(unlist(strsplit(span,":")))		
+		dg[[length(dg)+1]]<- span[2]
+		names(dg)[[length(dg)]]<-"span"
+	}
+}	
+	
+	out[["dg"]] <- list()
+	out[["dg"]] <- dg
   
-  out$seats <- seats
+#  out$seats <- seats
   out$file <- file
   out$tblnames <- tblnames
   out$Rtblnames <- Rtblnames
-  class(out) <- "x12"
+  class(out) <- "x12work"
   out  
   
   
@@ -1336,11 +1520,11 @@ out[["dg"]] <- dg
 
 
 
-print.x12 <- function(x,editor=getOption("editor"),...){
-  if(!(x$file=="Example_for_X12"))
-    filename <- paste(x$file,".out",sep="")
-  else
-    filename <- paste(paste(searchpaths()[grep("x12",searchpaths())],"/doc/Rout",sep=""),".out",sep="")
-  edit(file=filename,editor=editor,...)
-}
+#print.x12work <- function(x,editor=getOption("editor"),...){
+#  if(!(x$file=="Example_for_X12"))
+#    filename <- paste(x$file,".out",sep="")
+#  else
+#    filename <- paste(paste(searchpaths()[grep("x12",searchpaths())],"/doc/Rout",sep=""),".out",sep="")
+#  edit(file=filename,editor=editor,...)
+#}
 

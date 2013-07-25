@@ -1,8 +1,8 @@
-setGeneric("X12",
+setGeneric("x12",
     function(object, x12Parameter=new("x12Parameter"),
-        x12BaseInfo=new("x12BaseInfo"),...) { standardGeneric("X12")} )
+        x12BaseInfo=new("x12BaseInfo"),...) { standardGeneric("x12")} )
 setMethod(
-    f='X12',
+    f='x12',
     signature=signature(object = "ts"),
     definition=function(object, x12Parameter,x12BaseInfo) {
       Par <- slotNames(x12Parameter)
@@ -14,7 +14,7 @@ setMethod(
        for(p in Par){
          pp <- c(pp,(paste(p,"=x12BaseInfo@",p,sep="")))
        }
-      pp <- paste("out <- x12(tso=object,",paste(pp,collapse=","),",tblnames=\"otl\",Rtblnames=\"regressor\")",sep="")
+      pp <- paste("out <- x12work(tso=object,",paste(pp,collapse=","),",tblnames=\"otl\",Rtblnames=\"regressor\")",sep="")
       eval(parse(text=pp))
       classout <- new("x12Output")
       Par <- slotNames(classout)
@@ -37,7 +37,7 @@ setMethod(
     }
 )
 setMethod(
-    f='X12',
+    f='x12',
     signature=signature(object = "x12Single"),
     definition=function(object,x12BaseInfo=new("x12BaseInfo"),forceRun=FALSE) {
       if(length(object@x12OldParameter)>0)
@@ -63,7 +63,7 @@ setMethod(
         
         if(!is.null(object@tsName))
           pp <- c(pp, paste("file=\"",object@tsName,"\"",sep=""))
-        pp <- paste("out <- x12(tso=object@ts,",paste(pp,collapse=","),",tblnames=\"otl\",Rtblnames=\"regressor\")",sep="")
+        pp <- paste("out <- x12work(tso=object@ts,",paste(pp,collapse=","),",tblnames=\"otl\",Rtblnames=\"regressor\")",sep="")
         eval(parse(text=pp))
         classout <- new("x12Output")
         Par <- slotNames(classout)
@@ -89,16 +89,16 @@ setMethod(
     }
 )
 setMethod(
-    f='X12',
+    f='x12',
     signature=signature(object = "x12Batch"),
     definition=function(object,forceRun=FALSE) {
-      if(any(ls(1)=="x12path"))
-        object@x12BaseInfo@x12path <- get("x12path",as.environment(1))
+      if(existd("x12path"))
+        object@x12BaseInfo@x12path <- getd("x12path")
       else
-        stop("Please enter a x12path")
+        stop("Please enter an x12path")
       starting.time <- Sys.time()
       for(i in 1:length(object@x12List)){
-        object@x12List[[i]] <- X12(object@x12List[[i]],x12BaseInfo=object@x12BaseInfo,forceRun=forceRun)
+        object@x12List[[i]] <- x12(object@x12List[[i]],x12BaseInfo=object@x12BaseInfo,forceRun=forceRun)
       }
       print(Sys.time()-starting.time)
       return(object)

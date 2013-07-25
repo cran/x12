@@ -37,15 +37,15 @@ Function \code{cleanHistory} resets \code{x12OldParameter} and \code{x12OldOutpu
 \item{index}{index corresponding to (an) object(s) of class \code{"x12Single"}.}
 }
 
-\seealso{\code{\link{X12}}}
+\seealso{\code{\link{x12}}}
 
 
 \examples{
 data(AirPassengersX12)
 summary(AirPassengersX12)
-# a maximum of 10 previous X12 runs are added to the summary
+# a maximum of 10 previous x12 runs are added to the summary
 summary(AirPassengersX12,oldOutput=10)
-#the x12Parameter and x12Output of the x12Single is set to the previous run of X12
+#the x12Parameter and x12Output of the x12Single is set to the previous run of x12
 Ap=prev(AirPassengersX12)
 summary(AirPassengersX12,oldOutput=10)
 }

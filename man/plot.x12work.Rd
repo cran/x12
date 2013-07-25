@@ -1,14 +1,14 @@
-\name{plot.x12}
-\alias{plot.x12}
-\title{Plot method for objects of class x12}
+\name{plot.x12work}
+\alias{plot.x12work}
+\title{Plot method for objects of class x12work}
 \description{
-  Plot method for objects of class \code{"x12"}.
+  Plot method for objects of class \code{"x12work"}.
 }
 \usage{
-\method{plot}{x12}(x,plots=c(1:9), \dots)
+\method{plot}{x12work}(x,plots=c(1:9), \dots)
 }
 \arguments{
-  \item{x}{an object of class \code{"x12"}.}
+  \item{x}{an object of class \code{"x12work"}.}
   \item{plots}{a vector containing numbers between 1 and 9.}
   \item{\dots}{further arguments (currently ignored).}
 }
@@ -25,7 +25,7 @@
   9: Spectrum Residulas\cr
 }
 \author{Alexander Kowarik}
-\seealso{\code{\link{x12}}}
+\seealso{\code{\link{x12work}}}
 \examples{
   data(AirPassengersX12)
   #plot(AirPassengersX12)

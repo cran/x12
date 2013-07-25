@@ -1,40 +1,40 @@
 setMethod("summary",
     signature(object = "x12Output"),
-    function (object, fullSummary=FALSE, spectra.detail=FALSE, almostout=FALSE, rsd.autocorr=NULL, q2=FALSE, likelihood.stat=FALSE, aape=FALSE, id.rsdseas=FALSE,print=TRUE) 
+    function (object, fullSummary=FALSE, spectra.detail=FALSE, almostout=FALSE, rsd.autocorr=NULL, quality.stat=FALSE, likelihood.stat=FALSE, aape=FALSE, id.rsdseas=FALSE, slidingspans=FALSE, history=FALSE, identify=FALSE, print=TRUE) 
     {
       if(length(object@dg)>0){
         if(print)
-          summaryworkhorse(object@dg,fullSummary=fullSummary,spectra.detail=spectra.detail,almostout=almostout,rsd.autocorr=rsd.autocorr,q2=q2,likelihood.stat=likelihood.stat,aape=aape,id.rsdseas=id.rsdseas)
-        invisible(summary.output.workhorse(object@dg,fullSummary=fullSummary,spectra.detail=spectra.detail,almostout=almostout,rsd.autocorr=rsd.autocorr,q2=q2,likelihood.stat=likelihood.stat,aape=aape,id.rsdseas=id.rsdseas))
+          summaryworkhorse(object@dg,fullSummary=fullSummary,spectra.detail=spectra.detail,almostout=almostout,rsd.autocorr=rsd.autocorr,quality.stat=quality.stat,likelihood.stat=likelihood.stat,aape=aape,id.rsdseas=id.rsdseas,slidingspans=slidingspans,history=history,identify=identify)
+        invisible(summary.output.workhorse(object@dg,fullSummary=fullSummary,spectra.detail=spectra.detail,almostout=almostout,rsd.autocorr=rsd.autocorr,quality.stat=quality.stat,likelihood.stat=likelihood.stat,aape=aape,id.rsdseas=id.rsdseas,slidingspans=slidingspans,history=history,identify=identify))
       }else{
-        cat("You need to run X12 before viewing a summary!\n")
+        cat("You need to run x12 before viewing a summary!\n")
       }
     }
 )
 setMethod("summary",
     signature(object = "x12Single"),
-    function (object, fullSummary=FALSE, spectra.detail=FALSE, almostout=FALSE, rsd.autocorr=NULL, q2=FALSE, likelihood.stat=FALSE, aape=FALSE, id.rsdseas=FALSE,oldOutput=NULL,print=TRUE) 
+    function (object, fullSummary=FALSE, spectra.detail=FALSE, almostout=FALSE, rsd.autocorr=NULL, quality.stat=FALSE, likelihood.stat=FALSE, aape=FALSE, id.rsdseas=FALSE,slidingspans=FALSE, history=FALSE, identify=FALSE, oldOutput=NULL,print=TRUE) 
     { 
       ############
 #		sumout<-unlist(summary.output[,1])
 #		names.sumout<-unique(sumout)
 #		length.names.sumout<-unlist(lapply(names.sumout,function(x)length(grep(x,sumout))))
       ###########
-#	summary.output<-summary(object@x12Output,fullSummary=fullSummary,spectra.detail=spectra.detail,almostout=almostout,rsd.autocorr=rsd.autocorr,q2=q2,likelihood.stat=likelihood.stat,aape=aape,id.rsdseas=id.rsdseas)
+#	summary.output<-summary(object@x12Output,fullSummary=fullSummary,spectra.detail=spectra.detail,almostout=almostout,rsd.autocorr=rsd.autocorr,quality.stat=quality.stat,likelihood.stat=likelihood.stat,aape=aape,id.rsdseas=id.rsdseas,slidingspans=slidingspans,history=history,identify=identify)
       if(is.null(oldOutput)){
         if(!is.null(object@tsName)){  
           if(print){
             cat("--------------------------  ",object@tsName,"  ------------------------------------\n")
             cat("-----------------------------------------------------------------------------------\n")
           }
-          summary.output<-summary(object@x12Output,fullSummary=fullSummary,spectra.detail=spectra.detail,almostout=almostout,rsd.autocorr=rsd.autocorr,q2=q2,likelihood.stat=likelihood.stat,aape=aape,id.rsdseas=id.rsdseas,print=print)
+          summary.output<-summary(object@x12Output,fullSummary=fullSummary,spectra.detail=spectra.detail,almostout=almostout,rsd.autocorr=rsd.autocorr,quality.stat=quality.stat,likelihood.stat=likelihood.stat,aape=aape,id.rsdseas=id.rsdseas,slidingspans=slidingspans,history=history,identify=identify,print=print)
           names(summary.output)[2]<-object@tsName
         }else{  
           if(print){
             cat("--------------------------  Rout  ------------------------------------\n")
             cat("-----------------------------------------------------------------------------------\n")
           }
-          summary.output<-summary(object@x12Output,fullSummary=fullSummary,spectra.detail=spectra.detail,almostout=almostout,rsd.autocorr=rsd.autocorr,q2=q2,likelihood.stat=likelihood.stat,aape=aape,id.rsdseas=id.rsdseas,print=print)
+          summary.output<-summary(object@x12Output,fullSummary=fullSummary,spectra.detail=spectra.detail,almostout=almostout,rsd.autocorr=rsd.autocorr,quality.stat=quality.stat,likelihood.stat=likelihood.stat,aape=aape,id.rsdseas=id.rsdseas,slidingspans=slidingspans,history=history,identify=identify,print=print)
         }
       }else{
         nprev <- min(length(object@x12OldOutput),oldOutput)
@@ -43,14 +43,14 @@ setMethod("summary",
             cat("--------------------------  ",object@tsName,"  ------------------------------------\n")
             cat("-----------------------------------------------------------------------------------\n")
           }
-          summary.output<-summary(object@x12Output,fullSummary=fullSummary,spectra.detail=spectra.detail,almostout=almostout,rsd.autocorr=rsd.autocorr,q2=q2,likelihood.stat=likelihood.stat,aape=aape,id.rsdseas=id.rsdseas,print=print)
+          summary.output<-summary(object@x12Output,fullSummary=fullSummary,spectra.detail=spectra.detail,almostout=almostout,rsd.autocorr=rsd.autocorr,quality.stat=quality.stat,likelihood.stat=likelihood.stat,aape=aape,id.rsdseas=id.rsdseas,slidingspans=slidingspans,history=history,identify=identify,print=print)
           names(summary.output)[2]<-object@tsName
         }else{
           if(print){
             cat("--------------------------  Rout  ------------------------------------\n")
             cat("-----------------------------------------------------------------------------------\n")
           }
-          summary.output<-summary(object@x12Output,fullSummary=fullSummary,spectra.detail=spectra.detail,almostout=almostout,rsd.autocorr=rsd.autocorr,q2=q2,likelihood.stat=likelihood.stat,aape=aape,id.rsdseas=id.rsdseas,print=print)
+          summary.output<-summary(object@x12Output,fullSummary=fullSummary,spectra.detail=spectra.detail,almostout=almostout,rsd.autocorr=rsd.autocorr,quality.stat=quality.stat,likelihood.stat=likelihood.stat,aape=aape,id.rsdseas=id.rsdseas,slidingspans=slidingspans,history=history,identify=identify,print=print)
         }
         if(nprev>0){
           for(i in nprev:1){
@@ -63,7 +63,7 @@ setMethod("summary",
             if(TF){
               if(print)
                 cat("\n---------------------------  RUN  ",i,"  ----------------------------------------\n")
-              summary.oldout<-summary(object@x12OldOutput[[i]],fullSummary=fullSummary,spectra.detail=spectra.detail,almostout=almostout,rsd.autocorr=rsd.autocorr,q2=q2,likelihood.stat=likelihood.stat,aape=aape,id.rsdseas=id.rsdseas,print=print)
+              summary.oldout<-summary(object@x12OldOutput[[i]],fullSummary=fullSummary,spectra.detail=spectra.detail,almostout=almostout,rsd.autocorr=rsd.autocorr,quality.stat=quality.stat,likelihood.stat=likelihood.stat,aape=aape,id.rsdseas=id.rsdseas,slidingspans=slidingspans,history=history,identify=identify,print=print)
               names(summary.oldout)<-names(summary.output)
               summary.oldout<-rbind(c(paste("OLD OUTPUT",i),paste("Run",i)),summary.oldout)
               summary.output<-rbind(summary.output,summary.oldout)
@@ -80,13 +80,13 @@ setMethod("summary",
 setMethod("summary",
     signature(object = "x12Batch"),
     function (object, fullSummary=FALSE, spectra.detail=FALSE, almostout=FALSE, rsd.autocorr=NULL,
-        q2=FALSE, likelihood.stat=FALSE, aape=FALSE, id.rsdseas=FALSE,oldOutput=NULL,print=TRUE) 
+        quality.stat=FALSE, likelihood.stat=FALSE, aape=FALSE, id.rsdseas=FALSE,slidingspans=FALSE,history=FALSE,identify=FALSE,oldOutput=NULL,print=TRUE) 
     {
       summary.output<-list()
       for(i in 1:length(object@x12List)){
         if(print)
           cat("-----------------------------------------------------------------------------------\n")
-        summary.output[[length(summary.output)+1]]<-summary(object@x12List[[i]],fullSummary=fullSummary,spectra.detail=spectra.detail,almostout=almostout,rsd.autocorr=rsd.autocorr,q2=q2,likelihood.stat=likelihood.stat,aape=aape,id.rsdseas=id.rsdseas,oldOutput=oldOutput,print=print)
+        summary.output[[length(summary.output)+1]]<-summary(object@x12List[[i]],fullSummary=fullSummary,spectra.detail=spectra.detail,almostout=almostout,rsd.autocorr=rsd.autocorr,quality.stat=quality.stat,likelihood.stat=likelihood.stat,aape=aape,id.rsdseas=id.rsdseas,slidingspans=slidingspans,history=history,identify=identify,oldOutput=oldOutput,print=print)
       }
       if(is.null(oldOutput)){
         summary.output<-fun.table(summary.output,object=object)		
@@ -181,5 +181,14 @@ fun.table <- function(y,object){
   }
   y<-as.data.frame(new.out3)
   colnames(y)<-c("DIAGNOSTICS",col.names)
+  g <- grep("variable",as.character(y[,1]))
+  if(length(g)>1){
+	  ind1 <- 1:(g[1]-1)
+	  y2 <- y[ind1,]
+	  ind2 <- g
+	  y <- rbind(y2,y[ind2,],y[-c(ind1,ind2),])
+	  rownames(y) <- 1:nrow(y)
+  }
+  
   return(y)
 }
