@@ -439,11 +439,11 @@ cat("\nWarning: x12 cannot produce backcasts for time series that are more than 
   writeLines(c(header,datarows,addcommands),con)
   close(con)
 
-  
+  # Rewritten, for not using sh or bat files (Suggestions by Peter Ellis)
   if(Sys.info()[1]=="Windows"){
-    con1 <- file("run.bat")
-    mdcommand <- "md gra"
-	file_1 <- gsub("/","\\\\",file)
+    #con1 <- file("run.bat")
+    #mdcommand <- "md gra"
+	  file_1 <- gsub("/","\\\\",file)
     if((!is.null(x12path)) && use=="x12"){
       x12path_1 <- gsub("/","\\\\",x12path)
       command <- paste(x12path_1," ",file_1," -g gra",sep="")
@@ -453,8 +453,8 @@ cat("\nWarning: x12 cannot produce backcasts for time series that are more than 
     }else 
       stop("Please define the path to the X12 binaries!")
   }else{
-    con1 <- file("run.sh")
-    mdcommand <- "mkdir gra"
+    #con1 <- file("run.sh")
+    #mdcommand <- "mkdir gra"
     if((!is.null(x12path)) && use=="x12"){
       command <- paste(x12path," ",file," -g gra",sep="")
     }else if((!is.null(x13path)) && use!="x12"){
@@ -462,14 +462,16 @@ cat("\nWarning: x12 cannot produce backcasts for time series that are more than 
     }else
       stop("Please define the path to the X12 binaries!")
   }
-  writeLines(c(mdcommand,command),con1)
-  close(con1)
-  if(Sys.info()[1]=="Windows")
-    system("run.bat")
-  else{
-    system("chmod 744 run.sh")
-    system("./run.sh")
-  }
+  #writeLines(c(mdcommand,command),con1)
+  #close(con1)
+  dir.create("gra") 
+  system(command) 
+#  if(Sys.info()[1]=="Windows"){
+#    system("run.bat")
+#  }else{
+#    system("chmod 744 run.sh")
+#    system("./run.sh")
+#  }
 
 #  out <- list()
 
@@ -511,17 +513,16 @@ cat("\nWarning: x12 cannot produce backcasts for time series that are more than 
 #file.remove(grep(basename(file),list.files(dirname(file)),value=TRUE))
 
 if(!keep_x12out)
-unlink(paste(dirname(file),"/gra",sep=""),recursive=TRUE)
-if(file.exists("run.bat"))
-file.remove("run.bat")
-if(file.exists("run.sh"))
-file.remove("run.sh")	
+  unlink(paste(dirname(file),"/gra",sep=""),recursive=TRUE)
+#if(file.exists("run.bat"))
+#  file.remove("run.bat")
+#if(file.exists("run.sh"))
+#  file.remove("run.sh")	
 if(file.exists(paste(basename(file),".err",sep=""))){ 
-if(!keep_x12out)
-file.remove(paste(basename(file),".err",sep=""))
-}
-out
-
+  if(!keep_x12out)
+    file.remove(paste(basename(file),".err",sep=""))
+  }
+  out
 }
 
 readx12Out <- function(file,tblnames=NULL,Rtblnames=NULL,freq_series,start_series,end_series,seats=FALSE,transform,slidingspans,history,x11regress,outlier,showWarnings,keep_x12out){
@@ -573,10 +574,10 @@ if(!file.exists(paste(filename,".","udg",sep=""))){
 		}
 		if(!keep_x12out)
 			unlink(paste(dirname(file),"/gra",sep=""),recursive=TRUE)
-		if(file.exists("run.bat"))
-			file.remove("run.bat")
-		if(file.exists("run.sh"))
-			file.remove("run.sh")	
+		#if(file.exists("run.bat"))
+		#	file.remove("run.bat")
+		#if(file.exists("run.sh"))
+		#	file.remove("run.sh")	
 		
 		stop("Error! No proper run of x12! Check your parameter settings.")	
 	}
@@ -602,19 +603,19 @@ if(!file.exists(paste(filename,".","udg",sep=""))){
 			}
 			if(!keep_x12out)
 				unlink(paste(dirname(file),"/gra",sep=""),recursive=TRUE)
-			if(file.exists("run.bat"))
-				file.remove("run.bat")
-			if(file.exists("run.sh"))
-				file.remove("run.sh")	
+			#if(file.exists("run.bat"))
+			#	file.remove("run.bat")
+			#if(file.exists("run.sh"))
+			#	file.remove("run.sh")	
 			
 			stop("An error occured when running x12! Program halted!","\n") 	
 		}else{
 		if(!keep_x12out)
 			unlink(paste(dirname(file),"/gra",sep=""),recursive=TRUE)
-		if(file.exists("run.bat"))
-			file.remove("run.bat")
-		if(file.exists("run.sh"))
-			file.remove("run.sh")	
+		#if(file.exists("run.bat"))
+		#	file.remove("run.bat")
+		#if(file.exists("run.sh"))
+		#	file.remove("run.sh")	
 		
 		stop("An error occured when running x12! Program halted!","\n") 	
 	}
