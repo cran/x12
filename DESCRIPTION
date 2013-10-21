@@ -1,6 +1,6 @@
 Package: x12
-Version: 1.1-1
-Date: 2013-09-18
+Version: 1.2-0
+Date: 2013-10-21
 Title: x12 - wrapper function and structure for batch processing
 Author: Alexander Kowarik <alexander.kowarik@statistik.gv.at>, Angelika Meraner
 Maintainer: Alexander Kowarik <alexander.kowarik@statistik.gv.at>
@@ -15,7 +15,7 @@ Collate: 'class.R' 'crossVal-methods.R' 'env_functions.R'
         'parameter-methods.R' 'plot-methods.R' 'plotFunctions.R'
         'readSpc.R' 'summary-methods.R' 'summary.output.x12.R'
         'summary.x12.R' 'times.R' 'x12-methods.R' 'x12work.R' 'zzz.R'
-Packaged: 2013-09-19 11:30:05 UTC; kowa$
+Packaged: 2013-10-21 11:05:49 UTC; kowa$
 NeedsCompilation: no
 Repository: CRAN
-Date/Publication: 2013-09-20 08:07:32
+Date/Publication: 2013-10-21 13:37:15
