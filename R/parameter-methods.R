@@ -275,7 +275,7 @@ setMethod(
       return(object)
     })
 #Goto previous parameter setting and output
-# Generic function prev, cleanHistory
+# Generic function prev, cleanArchive
 setGeneric("prev",
     function(object, ...) { standardGeneric("prev")} )
 setMethod(
@@ -336,27 +336,32 @@ setMethod(
       }
       return(object)
     })
+setGeneric("cleanArchive",
+    function(object, ...) { standardGeneric("cleanArchive")} )
 setGeneric("cleanHistory",
-    function(object, ...) { standardGeneric("cleanHistory")} )
+    function(object, ...) {
+      .Deprecated("cleanArchive")
+      cleanArchive(object,...)
+    } )
 setMethod(
-    f='cleanHistory',
+    f='cleanArchive',
     signature=signature(object = "x12Single"),definition=function(object) {
        object@x12OldParameter <- object@x12OldOutput <- list()
       return(object)
     })
 setMethod(
-    f='cleanHistory',
+    f='cleanArchive',
     signature=signature(object = "x12Batch"),definition=function(object,index=NULL) {
       if(is.null(index)){##changing all
         cat("All previous parameters and outputs are deleted.\n")
         for(i in 1:length(object@x12List)){
-          object@x12List[[i]] <- cleanHistory(object@x12List[[i]]) 
+          object@x12List[[i]] <- cleanArchive(object@x12List[[i]]) 
         } 
       }else{
         if(is.numeric(index)){
           if(min(index)>0&max(index)<=length(object@x12List)){
             for(i in index){
-              object@x12List[[i]] <- cleanHistory(object@x12List[[i]])
+              object@x12List[[i]] <- cleanArchive(object@x12List[[i]])
             }
           }else
             stop("argument index is out of bounds!\n")
@@ -368,7 +373,7 @@ setMethod(
           if(all(index%in%namTS)){
             for(nam in index){
               ind <- which(nam==namTS)
-              object@x12List[[ind]] <- cleanHistory(object@x12List[[ind]])
+              object@x12List[[ind]] <- cleanArchive(object@x12List[[ind]])
             }
           }else
             stop("argument index contained names not found in the series names!\n")

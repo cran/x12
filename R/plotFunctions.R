@@ -176,7 +176,7 @@ plot_original_seasonal_trend <- function(out,ylab="Value",xlab="Date",
 plot_spectrum <- function(out,which="seasonaladj",xlab="Frequency",ylab="Decibels",
     main="default",
     col_bar="darkgrey",col_seasonal="red",col_td="blue",
-    lwd_bar=4,lwd_seasonal=1,lwd_td=1,plot_legend=TRUE,
+    lwd_bar=4,lwd_seasonal=4,lwd_td=4,plot_legend=TRUE,
     legend_horiz=TRUE,legend_bty="o",
     ...){
   if(which=="seasonaladj")
@@ -208,7 +208,7 @@ plot_spectrum <- function(out,which="seasonaladj",xlab="Frequency",ylab="Decibel
 plot_spectrum_work <- function(frequency,spectrum,xlab="Frequency",ylab="Decibels",
     f=12,main="default",highlight=TRUE,
     col_bar="darkgrey",col_seasonal="red",col_td="blue",
-    lwd_bar=4,lwd_seasonal=1,lwd_td=1,plot_legend=TRUE,
+    lwd_bar=4,lwd_seasonal=4,lwd_td=4,plot_legend=TRUE,
     legend_horiz=TRUE,legend_bty="o",
     ...)
 {
@@ -219,7 +219,7 @@ plot_spectrum_work <- function(frequency,spectrum,xlab="Frequency",ylab="Decibel
   tryCatch({
         par(mar = c(4, 4, 4, 2) + 0.1) 
         layout(matrix(c(rep(1,16),2,2),nrow=9,byrow=TRUE))#,heights = c(1, 6), respect = FALSE)
-        plot(frequency,spectrum,type="n",xlab=xlab,ylab=ylab,main=main,col=col_bar,...)
+        plot(frequency,spectrum,type="n",xlab=xlab,ylab=ylab,main=main,col=col_bar,xaxt="n",...)
         
         #f <- 12#frequency(out[["a1"]])
 #	abline(v=(1:(f/2))*1/f,col=col_seasonal,lwd=lwd_seasonal)
@@ -233,15 +233,16 @@ plot_spectrum_work <- function(frequency,spectrum,xlab="Frequency",ylab="Decibel
           }
           if(f==12){
             for(i in seq(11,61,10)){
-              points(x=rep(frequency[i],2),y=c(spectrum[i],coord),type="l",col=col_seasonal,lwd=lwd_bar)  
+              points(x=rep(frequency[i],2),y=c(spectrum[i],coord),type="l",col=col_seasonal,lwd=lwd_seasonal)  
             }
             
             for(i in c(43,53)){
-              points(x=rep(frequency[i],2),y=c(spectrum[i],coord),type="l",col=col_td,lwd=lwd_bar)  
-            }}
-          if(f==4){
+              points(x=rep(frequency[i],2),y=c(spectrum[i],coord),type="l",col=col_td,lwd=lwd_td)  
+            }
+            
+          }else if(f==4){
             for(i in c(31,61)){
-              points(x=rep(frequency[i],2),y=c(spectrum[i],coord),type="l",col=col_seasonal,lwd=lwd_bar)  
+              points(x=rep(frequency[i],2),y=c(spectrum[i],coord),type="l",col=col_seasonal,lwd=lwd_seasonal)  
             }
           }
         }else{
@@ -252,19 +253,30 @@ plot_spectrum_work <- function(frequency,spectrum,xlab="Frequency",ylab="Decibel
           for(i in 1:length(frequency)){
             points(x=rep(frequency[i],2),y=c(spectrum[i],coord),type="l",col=col_bar,lwd=lwd_bar)  
           }
-          
-        }	
+        }
+        if(f==12){
+          aT <- frequency[c(seq(11,61,10),43,53)]
+          aL <- paste(round(aT*12),"/",12,sep="")
+          aL[(length(aL)-1):length(aL)] <- c("0.348","0.432")
+          axis(side=1,at=aT,labels=aL,las=2)
+        }else{
+          aT <- frequency[c(31,61)]
+          aL <- paste(aT*12,"/",12,sep="")
+          axis(side=1,at=aT,labels=aL)
+        }
         par(mar = c(0, 0, 0, 0)) 
         plot(frequency,spectrum,type = "n", axes = FALSE, ann = FALSE,...)
         if(plot_legend){
           if(f==12)
-            legend("center",legend=c("Spectrum","Seasonal Frequencies","Trading Day Frequencies"),
-                lty=rep(1,3),col=c(col_bar,col_seasonal,col_td),bg="white",horiz=legend_horiz,bty=legend_bty)
+            legend("center",legend=c("Spectrum","Seasonal Freq.","Trading Day Freq."),
+                lty=rep(1,3),col=c(col_bar,col_seasonal,col_td),bg="white",horiz=legend_horiz,bty=legend_bty,lwd=lwd_bar)
           else
-            legend("center",legend=c("Spectrum","Seasonal Frequencies"),lty=rep(1,2),
-                col=c(col_bar,col_seasonal),bg="white",horiz=legend_horiz,bty=legend_bty)
+            legend("center",legend=c("Spectrum","Seasonal Freq."),lty=rep(1,2),
+                col=c(col_bar,col_seasonal),bg="white",horiz=legend_horiz,bty=legend_bty,lwd=lwd_bar)
         }
-        par(gp)},finally=par(gp))
+        gp <- gp[-which(names(gp)=="page")]
+        par(gp)
+      },finally=par(gp))
 }
 
 plot_rsd_acf <- function(out,which="acf",xlab="Lag",ylab="ACF",
@@ -288,8 +300,15 @@ plot_rsd_acf <- function(out,which="acf",xlab="Lag",ylab="ACF",
   }
   if(which=="rsd.pacf")
     ylab="Partial ACF"
-  plot(x[[which]]$lag,x[[which]][[grep("sample",names(x[[which]]),value=TRUE)]],type="h",xlab=xlab,ylab=ylab,main=main,col=col_acf,ylim=ylim)
+  plot(x[[which]]$lag,x[[which]][[grep("sample",names(x[[which]]),value=TRUE)]],type="h",xlab=xlab,ylab=ylab,main=main,col=col_acf,ylim=ylim,xaxt="n")
   abline(h=0,col=col_acf)
+  if(length(x[[which]]$lag)%in%c(12,24)){
+    aT <- c(6,12,18,24)
+    axis(side=1,at=aT)  
+  }else{
+    aT <- c(4,8,12,16)
+    axis(side=1,at=aT)
+  }
   lines(x[[which]]$lag,2*x[[which]][[grep("stderr",names(x[[which]]),value=TRUE)]],type="l",col=col_ci,lty=lt_ci)
   lines(x[[which]]$lag,-2*x[[which]][[grep("stderr",names(x[[which]]),value=TRUE)]],type="l",col=col_ci,lty=lt_ci)
 }

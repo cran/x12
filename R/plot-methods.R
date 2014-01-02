@@ -555,7 +555,10 @@ axis(1,at=aT,labels=aL)
 	
 			gp.new<-par()	
 			invisible(gp.new)
-            par(gp)},finally=par(gp))
+      gp <- gp[-which(names(gp)=="page")]
+      par(gp)
+      
+            },finally=par(gp))
 			}
 )
 
@@ -671,14 +674,21 @@ setMethod(
       if(which=="rsd.pacf")
         ylab="Partial ACF"
       
-      plot(x[[which]]$lag,x[[which]][[grep("sample",names(x[[which]]),value=TRUE)]],type="h",xlab=xlab,ylab=ylab,main=main,col=col_acf,ylim=ylim,lwd=lwd_acf,...)
+      plot(x[[which]]$lag,x[[which]][[grep("sample",names(x[[which]]),value=TRUE)]],type="h",xlab=xlab,ylab=ylab,main=main,col=col_acf,ylim=ylim,lwd=lwd_acf,xaxt="n",...)
+      if(length(x[[which]]$lag)%in%c(12,24)){
+        aT <- c(6,12,18,24)
+        axis(side=1,at=aT)  
+      }else{
+        aT <- c(4,8,12,16)
+        axis(side=1,at=aT)
+      }
       abline(h=0,col="black")
       lines(x[[which]]$lag,2*x[[which]][[grep("stderr",names(x[[which]]),value=TRUE)]],type="l",col=col_ci,lty=lt_ci)
       lines(x[[which]]$lag,-2*x[[which]][[grep("stderr",names(x[[which]]),value=TRUE)]],type="l",col=col_ci,lty=lt_ci)
      }
 	 else{
-	 plot(1:10, type = "n", xaxt="n", yaxt="n", xlab="", ylab="", main=main)	 
-	 text(5.5,5.5,"Not Available")
+	   plot(1:10, type = "n", xaxt="n", yaxt="n", xlab="", ylab="", main=main)	 
+	   text(5.5,5.5,"Not Available")
  	 }
 		 
  }
@@ -728,10 +738,14 @@ setMethod(
       }else{
         lab <- 1:f
       }
-      if(SI_Ratios){
-        main="Seasonal Factors by period and SI Ratios"
+      if("main"%in%names(list(...))){
+        main <- list(...)[["main"]]  
       }else{
-        main="Seasonal Factors by period"
+        if(SI_Ratios){
+          main="Seasonal Factors by period and SI Ratios"
+        }else{
+          main="Seasonal Factors by period"
+        }
       }
       #ylim <- c(min(v,na.rm=TRUE)*.95,max(v,na.rm=TRUE)*1.09)
       if(!"ylim"%in%names(list(...)))
@@ -748,10 +762,17 @@ setMethod(
               cex_siratio<-cex_siratio*1.5
               cex_replaced <-cex_replaced*1.5
             }
-            if(!"ylim"%in%names(list(...)))
-              plot(1,type="n",main=main,xlim=xlim,ylim=ylim,xaxt="n",ylab=ylab,xlab=xlab,cex=cex_siratio,...)
-            else
-              plot(1,type="n",main=main,xlim=xlim,xaxt="n",ylab=ylab,xlab=xlab,cex=cex_siratio,...)
+            if(!"ylim"%in%names(list(...))){
+              if(!"main"%in%names(list(...)))
+                plot(1,type="n",main=main,xlim=xlim,ylim=ylim,xaxt="n",ylab=ylab,xlab=xlab,cex=cex_siratio,...)
+              else
+                plot(1,type="n",xlim=xlim,ylim=ylim,xaxt="n",ylab=ylab,xlab=xlab,cex=cex_siratio,...)
+            }else{
+              if(!"main"%in%names(list(...)))
+                plot(1,type="n",main=main,xlim=xlim,xaxt="n",ylab=ylab,xlab=xlab,cex=cex_siratio,...)
+              else
+                plot(1,type="n",xlim=xlim,xaxt="n",ylab=ylab,xlab=xlab,cex=cex_siratio,...)
+            }
             axis(1,at=(1:f)-1/2,labels=lab)
             for(i in 0:(f)){    
               abline(v=i,col="grey")
@@ -788,17 +809,18 @@ setMethod(
               if(SI_Ratios){
                 if(SI_Ratios_replaced)
                   legend("center",legend=c("Seasonal Factors","Mean","SI Ratio","Replaced SI Ratio"),col=c(col_seasonal,col_mean,col_siratio,col_replaced),pch=c(NA,NA,20,20),
-                      lty=c(1,1,NA,NA),bg="white",ncol=2,pt.cex=1.4,horiz=legend_horiz,bty=legend_bty)
+                      lty=c(1,1,NA,NA),bg="white",pt.cex=1.4,horiz=legend_horiz,bty=legend_bty)
                 else
                   legend("center",legend=c("Seasonal Factors","Mean","SI Ratio"),
                       col=c(col_seasonal,col_mean,col_siratio),pch=c(NA,NA,20),
-                      lty=c(1,1,NA),bg="white",ncol=2,pt.cex=1.4,horiz=legend_horiz,bty=legend_bty)      
+                      lty=c(1,1,NA),bg="white",pt.cex=1.4,horiz=legend_horiz,bty=legend_bty)      
               }else
                 legend("center",legend=c("Seasonal Factors","Mean"),col=c(col_seasonal,col_mean),
                     lty=c(1,1),bg="white",horiz=legend_horiz,bty=legend_bty)
             }
 			gp.new<-par()	
 			invisible(gp.new)
+      gp <- gp[-which(names(gp)=="page")]
             par(gp)},finally=par(gp))	
 	}
 )
@@ -825,7 +847,7 @@ setMethod(
         xlab="Frequency",ylab="Decibels",
         main="Spectrum",highlight=TRUE,
         col_bar="darkgrey",col_seasonal="red",col_td="blue",
-        lwd_bar=4,lwd_seasonal=1,lwd_td=1,plot_legend=TRUE,
+        lwd_bar=4,lwd_seasonal=4,lwd_td=4,plot_legend=TRUE,
         legend_horiz=TRUE,legend_bty="o",        
         ...)
     {
@@ -869,7 +891,7 @@ setMethod(f='plotSpec',
         xlab="Frequency",ylab="Decibels",
         main="Spectrum",highlight=TRUE,
         col_bar="darkgrey",col_seasonal="red",col_td="blue",
-        lwd_bar=4,lwd_seasonal=1,lwd_td=1,plot_legend=TRUE,
+        lwd_bar=4,lwd_seasonal=4,lwd_td=4,plot_legend=TRUE,
         legend_horiz=TRUE,legend_bty="o",  
         ...){
       plotSpec(x@x12Output,which=which,
@@ -888,7 +910,7 @@ setMethod(
         xlab="Frequency",ylab="Decibels",
         main="Spectrum",highlight=TRUE,
         col_bar="darkgrey",col_seasonal="red",col_td="blue",
-        lwd_bar=4,lwd_seasonal=1,lwd_td=1,plot_legend=TRUE,
+        lwd_bar=4,lwd_seasonal=4,lwd_td=4,plot_legend=TRUE,
         legend_horiz=TRUE,legend_bty="o",
         ...)
     {
@@ -1000,7 +1022,6 @@ setMethod(
 				}
 				if(showCI){
 					yy <- as.numeric(uci_fc)
-					yy <- yy[length(yy):1]
 					yCI=c(as.numeric(lci_fc),yy)
 					xCI=c(time(lci_fc),time(lci_fc)[length(yy):1])
 #		  yCI=c(yCI[length(yCI)],yCI)#,yCI[1])
