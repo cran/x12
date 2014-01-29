@@ -31,7 +31,6 @@ x12work <- function(tso,period=frequency(tso),file="Rout",
     x12path=NULL,x13path=NULL,use="x12",
     keep_x12out=TRUE,showWarnings=TRUE
 ){
-  
   ### Quick Fix: Rename the parameters to previous version:
   seats=FALSE 
   seatsparameter=NULL
@@ -77,8 +76,8 @@ x12work <- function(tso,period=frequency(tso),file="Rout",
     if(file.exists(f))
       file.remove(f)
   }
-  
-  unlink(paste(dirname(file),"/gra",sep=""),recursive=TRUE)
+  dirgra <- paste("gra_",gsub("\\.","_",basename(file)),sep="")
+  unlink(paste(dirname(file),"/",dirgra,sep=""),recursive=TRUE)
   if((length(tso)/period)>15 && !is.null(backcast_years) && !showWarnings){
     cat("\nWarning: x12 cannot produce backcasts for time series that are more than 15 years long!\n")
   }
@@ -460,25 +459,26 @@ x12work <- function(tso,period=frequency(tso),file="Rout",
     file_1 <- gsub("/","\\\\",file)
     if((!is.null(x12path)) && use=="x12"){
       x12path_1 <- gsub("/","\\\\",x12path)
-      command <- paste(x12path_1," ",file_1," -g gra",sep="")
+      command <- paste(x12path_1," ",file_1," -g ",dirgra,sep="")
     }else if((!is.null(x13path)) && use!="x12"){
       x13path_1 <- gsub("/","\\\\",x13path)
-      command <- paste(x13path_1," ",file_1," -g gra",sep="")
+      command <- paste(x13path_1," ",file_1," -g ",dirgra,sep="")
     }else 
       stop("Please define the path to the X12 binaries!")
   }else{
     #con1 <- file("run.sh")
     #mdcommand <- "mkdir gra"
     if((!is.null(x12path)) && use=="x12"){
-      command <- paste(x12path," ",file," -g gra",sep="")
+      command <- paste(x12path," ",file," -g ",dirgra,sep="")
     }else if((!is.null(x13path)) && use!="x12"){
-      command <- paste(x13path," ",file," -g gra",sep="")
+      command <- paste(x13path," ",file," -g ",dirgra,sep="")
     }else
       stop("Please define the path to the X12 binaries!")
   }
   #writeLines(c(mdcommand,command),con1)
   #close(con1)
-  dir.create("gra") 
+  if(!file.exists(dirgra))
+    dir.create(dirgra) 
   system(command) 
 #  if(Sys.info()[1]=="Windows"){
 #    system("run.bat")
@@ -488,9 +488,16 @@ x12work <- function(tso,period=frequency(tso),file="Rout",
 #  }
   
 #  out <- list()
+  start_series <- start(tso)
+  end_series <- end(tso)
+  if(!is.null(span)){
+    if(!any(is.na(span[1:2])))
+      start_series <- as.numeric(span[1:2])
+    if(!any(is.na(span[3:4])))
+      end_series <- as.numeric(span[3:4])
   
-  
-  out <- readx12Out(file,freq_series=frequency(tso),start_series=start(tso),end_series=end(tso),tblnames=tblnames,Rtblnames=Rtblnames,transform=transform,slidingspans=slidingspans,history=history,x11regress=x11regress,outlier=outlier,showWarnings=showWarnings,keep_x12out=keep_x12out)
+  }
+  out <- readx12Out(file,freq_series=frequency(tso),start_series=start_series,end_series=end_series,tblnames=tblnames,Rtblnames=Rtblnames,transform=transform,slidingspans=slidingspans,history=history,x11regress=x11regress,outlier=outlier,showWarnings=showWarnings,keep_x12out=keep_x12out)
 #  Rtblnames <- c("Original series", "Final seasonal factors", "Final seasonally adjusted data", "Final trend cycle",
 #		    "Final irregular components","Combined adjustment factors","Final weights for irregular component",
 #			"Final replacements for SI ratios",
@@ -534,7 +541,7 @@ x12work <- function(tso,period=frequency(tso),file="Rout",
   }
   
   if(!keep_x12out)
-    unlink(paste(dirname(file),"/gra",sep=""),recursive=TRUE)
+    unlink(paste(dirname(file),"/",dirgra,sep=""),recursive=TRUE)
   out
 }
 
