@@ -1,4 +1,4 @@
-7b789deef08f145bc31af2799f8e4c2b *DESCRIPTION
+ccedfecf0d0e2a8d7c8697cd52d8778a *DESCRIPTION
 e12c32f918a4c6400e082513eaf00ea6 *NAMESPACE
 af5c079da1b0c08701089ab7058f161e *NEWS
 4fa86318af2e2992e6de5b401bfc4507 *R/class.R
@@ -14,8 +14,8 @@ fa93a2a2996e26f0cb33e649f59f819a *R/summary-methods.R
 7ef511d40e19e0d3b8c65e9f31e17ebc *R/summary.output.x12.R
 9c185b6675a901bec7a9ccc144e23466 *R/summary.x12.R
 18a34de47f1d63c508ff54c7fc8713db *R/times.R
-9ce166167aacd7cc2f31b6fd767be828 *R/x12-methods.R
-6885ade0b48d96d3dc38d5d576af9d62 *R/x12work.R
+2ba3869a1d937f079eb3ca9baf8a4920 *R/x12-methods.R
+bc151f7b0d24221ab78cf7c01ce17a6e *R/x12work.R
 42298a0c879bc476ff4434dad240f9a1 *R/zzz.R
 563d733c992833817b16231c046c66fd *README
 2c51e9a716cc994de8508de5b287257f *data/AirPassengersX12.RData
