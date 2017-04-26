@@ -28,7 +28,9 @@ x12work <- function(tso,period=frequency(tso),file="Rout",
     x11.excludefcst=TRUE,x11.final="user",
     x11regression=FALSE,
     tblnames=NULL,Rtblnames=NULL,
-    x12path=NULL,x13path=NULL,use="x12",
+    x12path=NULL,
+#    x13path=NULL,
+    use="x12",
     keep_x12out=TRUE,showWarnings=TRUE
 ){
   ### Quick Fix: Rename the parameters to previous version:
@@ -166,7 +168,7 @@ x12work <- function(tso,period=frequency(tso),file="Rout",
     if(!is.null(regvariables))
       addcommands[length(addcommands)+1] <- paste("variables=(",paste(regvariables,collapse=" "),")",sep="")
     if(!is.null(aictest))
-      addcommands[length(addcommands)+1] <- paste("aictest=(",aictest,") savelog= aictest",sep="")
+      addcommands[length(addcommands)+1] <- paste("aictest=(",paste(aictest,collapse=" "),") savelog= aictest",sep="")
     if(!is.null(reguser)){
       forbidden.regression.user <- c("x11regress:",
           "samode:","finmode:","seasonalma:","trendma:","sfmsr:",
@@ -461,10 +463,10 @@ x12work <- function(tso,period=frequency(tso),file="Rout",
     file_1 <- gsub("/","\\\\",file)
     if((!is.null(x12path)) && use=="x12"){
       x12path_1 <- gsub("/","\\\\",x12path)
-      command <- paste(x12path_1," ",file_1," -g ",dirgra,sep="")
+      command <- paste("\"",x12path_1,"\" ",file_1," -g ",dirgra,sep="")
     }else if((!is.null(x13path)) && use!="x12"){
       x13path_1 <- gsub("/","\\\\",x13path)
-      command <- paste(x13path_1," ",file_1," -g ",dirgra,sep="")
+      command <- paste("\"","x13path_1","\" ",file_1," -g ",dirgra,sep="")
     }else 
       stop("Please define the path to the X12 binaries!")
   }else{

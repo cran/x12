@@ -42,7 +42,7 @@ x12(object,x12Parameter=new("x12Parameter"),x12BaseInfo=new("x12BaseInfo"),...)
 }
 
 \source{
-  \url{http://www.census.gov/srd/www/x12a/}
+  \url{https://www.census.gov/srd/www/x13as/}
 }
 
 \note{
@@ -70,12 +70,12 @@ Alexander Kowarik, Angelika Meraner}
 }
 
 \examples{
-\dontrun{
-x12path("../x12a.exe")
 xts <- x12(AirPassengers)
 summary(xts)
 xs <- x12(new("x12Single",ts=AirPassengers))
 summary(xs)
+
+\dontrun{
 xb<-x12(new("x12Batch",list(AirPassengers,AirPassengers,AirPassengers)))
 summary(xb)
 
