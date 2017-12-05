@@ -175,7 +175,7 @@ setMethod(
 			  #"seats",
 			  #"seatsparameter"
 			  )
-      
+
       mn <- whichP%in%paras
       if(any(!mn)){
         warning("The following parameters could not be matched: ",paste(whichP[!mn],collapse=" , "))
@@ -209,7 +209,7 @@ setMethod(
         cat("The parameters for all objects are shown.\n")
         for(i in 1:length(object@x12List)){
           ret[[length(ret)+1]] <- getP(object@x12List[[i]],whichP=whichP)
-        } 
+        }
       }else{
         if(is.integer(index)){
           if(min(index)>0&max(index)<=length(object@x12List)){
@@ -230,10 +230,10 @@ setMethod(
             }
           }else
             stop("argument index contained names not found in the series names!\n")
-          
+
         }else
           stop("argument index must be either integer or character!\n")
-        
+
       }
       return(ret)
     })
@@ -241,37 +241,36 @@ setMethod(
 setMethod(
     f='setP',
     signature=signature(object = "x12Batch"),definition=function(object, listP,index=NULL) {
+      res <- object@x12List@.Data
       if(is.null(index)){##changing all
         cat("The parameters for all objects are changed.\n")
         for(i in 1:length(object@x12List)){
-          object@x12List[[i]] <- setP(object@x12List[[i]],listP=listP)
-        } 
+          res[[i]] <- setP(res[[i]],listP=listP)
+        }
       }else{
         if(is.numeric(index)){
           if(min(index)>0&max(index)<=length(object@x12List)){
             for(i in index){
-              object@x12List[[i]] <- setP(object@x12List[[i]],listP=listP)
+              res[[i]] <- setP(res[[i]],listP=listP)
             }
           }else
             stop("argument index is out of bounds!\n")
         }else if(is.character(index)){
           namTS <- vector()
           for(i in 1:length(object@x12List)){
-            namTS <- c(namTS,object@x12List[[i]]@tsName)
+            namTS <- c(namTS,res[[i]]@tsName)
           }
           if(all(index%in%namTS)){
             for(nam in index){
               ind <- which(nam==namTS)
-              object@x12List[[ind]] <- setP(object@x12List[[ind]],listP=listP)
+              res[[ind]] <- setP(res[[ind]],listP=listP)
             }
           }else
             stop("argument index contained names not found in the series names!\n")
-          
         }else
           stop("argument index must be either integer or character!\n")
-
       }
-      
+      object@x12List@.Data <- res
       return(object)
     })
 #Goto previous parameter setting and output
@@ -287,7 +286,7 @@ setMethod(
         ind <- n
       else
         stop("Please provide an index corresponding to a previous run. (see summary with oldOutput>0)")
-        
+
       object@x12Output <- object@x12OldOutput[[ind]]
       object@x12Parameter <- object@x12OldParameter[[ind]]
       oldout <- list()
@@ -308,8 +307,8 @@ setMethod(
       if(is.null(index)){##changing all
         cat("All current parameters and outputs are replaced by the previous ones.\n")
         for(i in 1:length(object@x12List)){
-          object@x12List[[i]] <- prev(object@x12List[[i]],n=n) 
-        } 
+          object@x12List[[i]] <- prev(object@x12List[[i]],n=n)
+        }
       }else{
         if(is.numeric(index)){
           if(min(index)>0&max(index)<=length(object@x12List)){
@@ -330,7 +329,7 @@ setMethod(
             }
           }else
             stop("argument index contained names not found in the series names!\n")
-          
+
         }else
           stop("argument index must be either integer or character!\n")
       }
@@ -355,8 +354,8 @@ setMethod(
       if(is.null(index)){##changing all
         cat("All previous parameters and outputs are deleted.\n")
         for(i in 1:length(object@x12List)){
-          object@x12List[[i]] <- cleanArchive(object@x12List[[i]]) 
-        } 
+          object@x12List[[i]] <- cleanArchive(object@x12List[[i]])
+        }
       }else{
         if(is.numeric(index)){
           if(min(index)>0&max(index)<=length(object@x12List)){
@@ -377,7 +376,7 @@ setMethod(
             }
           }else
             stop("argument index contained names not found in the series names!\n")
-          
+
         }else
           stop("argument index must be either integer or character!\n")
       }
@@ -445,7 +444,7 @@ setMethod(
       if(class(parList)=="x12Parameter"){
         warning("All Parameters will be overwritten with one loaded parameter configuration")
         for(i in 1:length(object@x12List)){
-          object@x12List[[i]]@x12Parameter <- parList 
+          object@x12List[[i]]@x12Parameter <- parList
         }
       }else{
         if(length(parList)!=length(object@x12List))
