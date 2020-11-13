@@ -21,13 +21,14 @@ x12path <- function(path=NULL){
     path <- file.path(x13p,files[head(grep("x13as",files),1)])
   }
   pathWork("x12path",path)  
+  invisible(path)
 }
 #x13path <- function(path=NULL){
 #  pathWork("x13path",path)
 #}
 
 pathWork <- function(name,path){
-  if(is.null(path)){
+  if(is.null(path)||length(path)!=1){
     if(existd(name))
       return(getd(name))
     else
