@@ -473,10 +473,11 @@ x12work <- function(tso,period=frequency(tso),file="Rout",
   }else{
     #con1 <- file("run.sh")
     #mdcommand <- "mkdir gra"
+    quiet <-ifelse(is.null(options("x12.message")$x12.message),"", " -q ")
     if((!is.null(x12path)) && use=="x12"){
-      command <- paste(x12path," ",file," -g ",dirgra,sep="")
+      command <- paste(x12path," ",file, quiet, " -r -g ",dirgra,sep="")
     }else if((!is.null(x13path)) && use!="x12"){
-      command <- paste(x13path," ",file," -g ",dirgra,sep="")
+      command <- paste(x13path," ",file, quiet, " -r -g ",dirgra,sep="")
     }else
       stop("Please define the path to the X12 binaries!")
   }
@@ -484,7 +485,12 @@ x12work <- function(tso,period=frequency(tso),file="Rout",
   #close(con1)
   if(!file.exists(dirgra))
     dir.create(dirgra) 
-  system(command) 
+  if(is.null(options("x12.message")$x12.message)){
+    system(command)  
+  }else{
+    system(command, ignore.stdout = TRUE, ignore.stderr = TRUE)
+  }
+  
 #  if(Sys.info()[1]=="Windows"){
 #    system("run.bat")
 #  }else{
