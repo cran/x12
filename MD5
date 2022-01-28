@@ -1,4 +1,4 @@
-223937f68b3054e6a6ce48f37a8fd82a *DESCRIPTION
+5c10bbc2acba8140959caa96b6df8895 *DESCRIPTION
 405d6c86a33434371033b5641c8b084d *NAMESPACE
 d28bbc61bd70d79f5b56411826b11feb *NEWS
 5293ba0d2501e75a5feb1638d341fb83 *R/class.R
@@ -50,4 +50,4 @@ c442a4df83c66acb6316ac310c65aae9 *man/x12-methods.Rd
 9d2239dbc99d2481ca76839c2c3d3e6d *man/x12Parameter-class.Rd
 984023500bb3271aa93ac412ecc077f9 *man/x12Single-class.Rd
 c8edfb780826367319c0fa7d7ca1452b *man/x12work.Rd
-01542e1a752125490dc4e09086ccc682 *tests/tinytest.R
+1c544f41f77c898437ad57e3e57bfcb6 *tests/tinytest.R
