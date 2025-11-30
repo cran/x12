@@ -1,4 +1,4 @@
-7aef66c7deb0f802d74a2e800a0464d2 *DESCRIPTION
+441b72de93d0224ea1a5ff7cbf21f98b *DESCRIPTION
 405d6c86a33434371033b5641c8b084d *NAMESPACE
 d28bbc61bd70d79f5b56411826b11feb *NEWS
 c5ccbba8e52935b3648520e4d3e35640 *R/class.R
@@ -6,7 +6,7 @@ c5ccbba8e52935b3648520e4d3e35640 *R/class.R
 9a0b48f6d70d785d43eb85e9389f694c *R/env_functions.R
 0bc5ab4d7e48dda5766ddfd59d1c79a0 *R/ggplot2Fn.R
 312583fbe00d60f5477c408334fab7bf *R/parameter-methods.R
-9ac50989b3dd2eb13a864faf25224f60 *R/plot-methods.R
+89997548bb74ddfbae11152ea1dcc161 *R/plot-methods.R
 8838813533d58377d61fa0b4bc280f9e *R/plotFunctions.R
 e8e8e059f6c53b2957db1ef976fb08db *R/readSpc.R
 cd284dee5ecfe89201e7e3691946a11e *R/readx12Out.R
@@ -17,10 +17,10 @@ fa93a2a2996e26f0cb33e649f59f819a *R/summary-methods.R
 a54a85450a967f4294d3578a5d00ca21 *R/x12-methods.R
 97c47c8f117fce8d02b75dbd0e609197 *R/x12work.R
 494c3c924e5dc7c49b62494a59828ad5 *R/zzz.R
-515199cf8376b3522d16adc139973a3a *README.md
+bd481cce6ec10a56ff62e7a586c17c22 *README.md
 2c51e9a716cc994de8508de5b287257f *data/AirPassengersX12.RData
 882c54a3c9420c9123050d9f9bde774f *data/AirPassengersX12Batch.RData
-26d32cef370214258d84ec07745d2b5a *inst/CITATION
+2e46ac074a12bf8c2e60a65162e98620 *inst/CITATION
 2a2b2fcf4438360ba892ff94335b47b2 *inst/tinytest/test_AirPassengers.R
 31f6c185803d21c4f7e4cbe989518a1f *man/AirPassengersX12.Rd
 960a4bebb811a1e14eea5f25d1b70ae2 *man/AirPassengersX12Batch.Rd
